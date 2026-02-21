@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreamSports — Sports Streaming Calendar</title>
+<style>
+:root {
+  --bg:#f0f2f5;--bg-card:#fff;--bg-nav:#0f172a;--text:#1e293b;--text-muted:#64748b;
+  --border:#e2e8f0;--shadow:0 1px 6px rgba(0,0,0,.07);--shadow-hover:0 4px 20px rgba(0,0,0,.13);
+  --input-bg:#fff;--accent:#4f46e5;
+}
+[data-theme="dark"] {
+  --bg:#0d1117;--bg-card:#161b22;--bg-nav:#010409;--text:#e6edf3;--text-muted:#8b949e;
+  --border:#30363d;--shadow:0 1px 6px rgba(0,0,0,.4);--shadow-hover:0 4px 20px rgba(0,0,0,.6);
+  --input-bg:#21262d;--accent:#818cf8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+/* NAV */
+nav{position:sticky;top:0;z-index:1000;background:var(--bg-nav);padding:0 20px;display:flex;align-items:center;gap:4px;height:58px;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.nav-brand{color:#fff;font-weight:800;font-size:17px;margin-right:12px;text-decoration:none;letter-spacing:-.3px;white-space:nowrap}
+.nav-brand em{color:#818cf8;font-style:normal}
+.nav-link{color:rgba(255,255,255,.7);background:transparent;border:none;padding:7px 13px;border-radius:7px;font-size:13.5px;font-weight:500;cursor:pointer;transition:.15s;white-space:nowrap}
+.nav-link:hover,.nav-link.active{color:#fff;background:rgba(255,255,255,.13)}
+.dark-toggle{margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.dark-toggle:hover{background:rgba(255,255,255,.2)}
+/* PAGES */
+.page{display:none;padding:28px 22px;max-width:1180px;margin:0 auto}
+.page.active{display:block}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+.page-subtitle{color:var(--text-muted);font-size:14px;margin-bottom:22px}
+/* TIMELINE */
+.tl-section{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:24px;overflow:hidden}
+.tl-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.tl-heading{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--text-muted)}
+.tl-nav{display:flex;align-items:center;gap:8px}
+.tl-yr-btn{background:var(--bg);border:1px solid var(--border);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--text);font-size:15px;font-family:inherit;transition:.15s;line-height:1;display:flex;align-items:center;justify-content:center}
+.tl-yr-btn:hover{background:var(--border)}
+.tl-yr-lbl{font-size:14px;font-weight:700;color:var(--text);min-width:38px;text-align:center}
+.tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tl-inner{min-width:560px}
+.tl-months{display:flex;margin-left:90px;border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:6px}
+.tl-month{flex:1;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--text-muted);text-align:center;min-width:22px}
+.tl-row{display:flex;align-items:center;height:24px;margin-bottom:3px}
+.tl-lbl{width:90px;flex-shrink:0;font-size:10px;font-weight:600;color:var(--text-muted);padding-right:8px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-track{flex:1;position:relative;height:100%}
+.tl-bar{position:absolute;top:2px;bottom:2px;border-radius:4px;display:flex;align-items:center;padding:0 5px;font-size:8px;font-weight:700;overflow:hidden;white-space:nowrap;opacity:.88;cursor:default;transition:opacity .15s}
+.tl-bar:hover{opacity:1}
+.tl-empty{text-align:center;padding:16px;color:var(--text-muted);font-size:13px}
+/* SEASON CARDS */
+.season-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.season-card{background:var(--bg-card);border-radius:14px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--border);transition:.2s}
+.season-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px)}
+.card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.sport-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;flex-shrink:0;margin-top:2px}
+.card-info{flex:1}
+.card-title{font-size:15px;font-weight:700;line-height:1.3}
+.status-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;flex-shrink:0;margin-top:2px}
+.s-active{background:#dcfce7;color:#15803d}
+.s-upcoming{background:#dbeafe;color:#1d4ed8}
+.s-off{background:#fef2f2;color:#991b1b}
+[data-theme="dark"] .s-active{background:#14532d;color:#4ade80}
+[data-theme="dark"] .s-upcoming{background:#1e3a5f;color:#60a5fa}
+[data-theme="dark"] .s-off{background:#450a0a;color:#f87171}
+.card-dates{display:flex;gap:20px;margin-bottom:12px}
+.date-box label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:2px;font-weight:600}
+.date-box span{font-size:13px;font-weight:600}
+.card-divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+.plat-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);font-weight:600;margin-bottom:7px}
+.plat-tags{display:flex;flex-wrap:wrap;gap:5px}
+.plat-tag{font-size:11.5px;padding:3px 9px;border-radius:5px;background:var(--bg);border:1px solid var(--border);font-weight:500}
+.plat-tag.unc{border-style:dashed;opacity:.8}
+.plat-tag.unc::after{content:' ⚠';font-size:10px}
+.card-note{margin-top:9px;font-size:11.5px;color:var(--text-muted);font-style:italic;line-height:1.5}
+/* FILTERS */
+.filters{background:var(--bg-card);border:1px solid var(--border);border-radius:11px;padding:14px 18px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px}
+.fg label{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:700}
+.fg select,.fg input{padding:8px 11px;border:1px solid var(--border);border-radius:7px;background:var(--input-bg);color:var(--text);font-size:13.5px;outline:none;transition:.15s;font-family:inherit}
+.fg select:focus,.fg input:focus{border-color:var(--accent)}
+.fg.fg-season select{font-weight:600}
+.btn-reset{padding:8px 14px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--text-muted);font-size:13px;cursor:pointer;transition:.15s;font-family:inherit;align-self:flex-end}
+.btn-reset:hover{border-color:var(--text-muted);color:var(--text)}
+.results-info{font-size:13px;color:var(--text-muted);margin-bottom:12px}
+.archive-banner{background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#92400e;display:none}
+[data-theme="dark"] .archive-banner{background:#451a03;border-color:#b45309;color:#fcd34d}
+/* SPORT SECTIONS */
+.sport-section{margin-bottom:14px;border:1px solid var(--border);border-radius:11px;overflow:hidden;background:var(--bg-card)}
+.sport-sec-hdr{display:flex;align-items:center;gap:10px;padding:10px 15px;background:var(--bg);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:.15s}
+.sport-sec-hdr:hover{background:var(--border)}
+.sport-sec-count{font-size:12px;color:var(--text-muted)}
+.sport-sec-toggle{font-size:11px;color:var(--text-muted);margin-left:auto;min-width:12px}
+.sport-event-row{display:flex;align-items:flex-start;gap:10px;padding:9px 15px;border-bottom:1px solid var(--border);font-size:13px}
+.sport-event-row:last-child{border-bottom:none}
+.sport-event-row:hover{background:rgba(79,70,229,.04)}
+.se-date{min-width:80px;flex-shrink:0;font-size:11.5px;color:var(--text-muted);font-weight:500;padding-top:1px}
+.se-name{flex:1;font-weight:500;line-height:1.35}
+.se-plats{display:flex;flex-wrap:wrap;gap:3px;flex-shrink:0;max-width:200px;padding-top:1px}
+.sport-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap}
+.plat-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);white-space:nowrap;margin:1px}
+.unc-flag{font-size:11px;margin-left:3px;cursor:help;color:#f59e0b}
+.no-results{text-align:center;padding:48px;color:var(--text-muted);font-size:15px}
+/* LOOKUP */
+.lookup-wrap{max-width:780px;margin:0 auto}
+.lookup-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:22px}
+.lookup-box label{display:block;font-size:13.5px;font-weight:700;margin-bottom:9px}
+.lookup-sel{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);font-size:15px;outline:none;cursor:pointer;transition:.15s;font-family:inherit}
+.lookup-sel:focus{border-color:var(--accent)}
+.lk-header{display:flex;align-items:center;gap:12px;padding:18px 22px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px 12px 0 0;border-bottom:none}
+.lk-plat-name{font-size:20px;font-weight:800}
+.lk-count{color:var(--text-muted);font-size:13px}
+.lk-group{background:var(--bg-card);border:1px solid var(--border);border-top:none}
+.lk-group:last-child{border-radius:0 0 12px 12px}
+.lk-group-hdr{padding:9px 22px;background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+.lk-item{padding:12px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:11px}
+.lk-item:last-child{border-bottom:none}
+.lk-name{font-weight:500;flex:1;font-size:13.5px}
+.lk-meta{font-size:12px;color:var(--text-muted);white-space:nowrap;padding-top:2px}
+.lk-empty{text-align:center;padding:48px;color:var(--text-muted)}
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:0 12px;gap:2px}
+  .nav-brand{font-size:14px;margin-right:6px}
+  .nav-link{padding:6px 9px;font-size:12.5px}
+  .page{padding:16px 14px}
+  .page-title{font-size:21px}
+  .season-grid{grid-template-columns:1fr}
+  .se-plats{max-width:130px}
+}
+@media(max-width:420px){
+  .nav-link .nl-text{display:none}
+  .tl-lbl{width:64px;font-size:8.5px}
+  .tl-months{margin-left:64px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#"><em>Stream</em>Sports</a>
+  <button class="nav-link active" onclick="showPage('seasons')"><span class="nl-icon">📅</span> <span class="nl-text">Seasons</span></button>
+  <button class="nav-link" onclick="showPage('calendar')"><span class="nl-icon">🗓</span> <span class="nl-text">Calendar</span></button>
+  <button class="nav-link" onclick="showPage('lookup')"><span class="nl-icon">🔍</span> <span class="nl-text">By Platform</span></button>
+  <button class="dark-toggle" onclick="toggleDark()" id="darkBtn" title="Toggle dark mode">🌙</button>
+</nav>
+
+<!-- PAGE 1 -->
+<div id="page-seasons" class="page active">
+  <h1 class="page-title">Sports Season Overview</h1>
+  <p class="page-subtitle">When each sport is in season (month view, year-agnostic). Hover a bar for active months. <strong>⚠</strong> on a platform tag = verify before streaming.</p>
+  <div id="tl-container" class="tl-section"></div>
+  <div id="season-grid" class="season-grid"></div>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page-calendar" class="page">
+  <h1 class="page-title">Event Calendar</h1>
+  <p class="page-subtitle">Games organized by sport. Switch seasons to view the 2024-25 archive. <strong>⚠</strong> = verify platform.</p>
+  <div class="filters">
+    <div class="fg fg-season" style="max-width:170px">
+      <label>Season</label>
+      <select id="s-season" onchange="applyFilters()">
+        <option value="current">2025-26 Current</option>
+        <option value="archive">2024-25 Archive</option>
+      </select>
+    </div>
+    <div class="fg"><label>Search</label><input type="text" id="s-search" placeholder="Event or sport…" oninput="applyFilters()"></div>
+    <div class="fg"><label>Sport</label><select id="s-sport" onchange="applyFilters()"><option value="">All Sports</option></select></div>
+    <div class="fg"><label>Platform</label><select id="s-plat" onchange="applyFilters()"><option value="">All Platforms</option></select></div>
+    <div class="fg"><label>Month</label><select id="s-month" onchange="applyFilters()"><option value="">All Months</option></select></div>
+    <button class="btn-reset" onclick="resetFilters()">↺ Reset</button>
+  </div>
+  <div class="archive-banner" id="archive-banner">📁 Viewing 2024-25 Archive — historical season data for reference</div>
+  <div class="results-info" id="results-info"></div>
+  <div id="sport-sections"></div>
+  <div id="no-results" class="no-results" style="display:none">No events match your filters.</div>
+</div>
+
+<!-- PAGE 3 -->
+<div id="page-lookup" class="page">
+  <h1 class="page-title">Platform Lookup</h1>
+  <p class="page-subtitle">Choose a streaming service to see every sport and event available on it.</p>
+  <div class="lookup-wrap">
+    <div class="lookup-box">
+      <label for="lk-sel">Streaming Platform</label>
+      <select id="lk-sel" class="lookup-sel" onchange="renderLookup()">
+        <option value="">— Select a platform —</option>
+      </select>
+    </div>
+    <div id="lk-results"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SPORT COLORS
+// ============================================================
+const SC = {
+  'NFL':             {bg:'#013369',tx:'#fff'},
+  'NBA':             {bg:'#1d428a',tx:'#fff'},
+  'NHL':             {bg:'#1a1a1a',tx:'#fff'},
+  'MLB':             {bg:'#002D72',tx:'#fff'},
+  'MLS':             {bg:'#1d2951',tx:'#fff'},
+  "Men's CBB":       {bg:'#c2410c',tx:'#fff'},
+  "Women's CBB":     {bg:'#9b1c31',tx:'#fff'},
+  'Premier League':  {bg:'#3d195b',tx:'#fff'},
+  'Champions League':{bg:'#1b4fba',tx:'#fff'},
+  'Europa League':   {bg:'#e05c00',tx:'#fff'},
+  'La Liga':         {bg:'#be1522',tx:'#fff'},
+  'Serie A':         {bg:'#024494',tx:'#fff'},
+  'Bundesliga':      {bg:'#c0010d',tx:'#fff'},
+  'UFC':             {bg:'#b91c1c',tx:'#fff'},
+  'WWE':             {bg:'#cc0000',tx:'#fff'},
+  'Winter Olympics': {bg:'#0081c8',tx:'#fff'},
+};
+const sc = s => SC[s] || {bg:'#475569',tx:'#fff'};
+
+// ============================================================
+// SEASONS DATA
+// ============================================================
+const SEASONS = [
+// ── 2024-25 ARCHIVED SEASONS ──
+  {
+    sport:'NFL', name:'NFL 2024-25 Season',
+    start:'2024-09-05', end:'2025-02-09',
+    plats:[
+      {n:'Amazon Prime Video', note:'Thursday Night Football — exclusive', conf:true},
+      {n:'Peacock', note:'Sunday Night Football + select playoff games', conf:true},
+      {n:'ESPN+', note:'Monday Night Football on ESPN/ABC', conf:true},
+      {n:'Paramount+', note:'AFC playoff games on CBS/Paramount+', conf:true},
+      {n:'Tubi', note:'Super Bowl LIX streamed free on Tubi (Fox broadcast)', conf:true},
+    ],
+    note:'Super Bowl LIX (Feb 9, 2025): Eagles beat Chiefs, streamed free on Tubi. AFC Champ on CBS/Paramount+.'
+  },
+  {
+    sport:'NBA', name:'NBA 2024-25 Season',
+    start:'2024-10-22', end:'2025-06-22',
+    plats:[
+      {n:'ESPN+', note:'ESPN/ABC package games', conf:true},
+      {n:'Max', note:'TNT package games — Warner Bros. Discovery deal', conf:true},
+      {n:'Netflix', note:'Christmas Day 2024 games — historic NBA debut on Netflix', conf:true},
+    ],
+    note:'Final season under old TV deal. Netflix debuted NBA Christmas games Dec 25, 2024. New $76B deal starts 2025-26.'
+  },
+  {
+    sport:'NHL', name:'NHL 2024-25 Season',
+    start:'2024-10-08', end:'2025-06-15',
+    plats:[
+      {n:'ESPN+', note:'ESPN/ABC package through 2027-28', conf:true},
+      {n:'Max', note:'TNT/Turner package games stream on Max', conf:true},
+      {n:'Peacock', note:'Select games on NBC/Peacock', conf:true},
+    ],
+    note:'Rights split between ESPN+ and Max (TNT). Winter Classic 2025 on Max. Finals on ESPN/ABC.'
+  },
+  {
+    sport:'MLB', name:'MLB 2024 Season',
+    start:'2024-03-28', end:'2024-11-01',
+    plats:[
+      {n:'Apple TV', note:'Friday Night Baseball — 2 free games per Friday', conf:true},
+      {n:'Peacock', note:'Saturday Leadoff exclusive game', conf:true},
+      {n:'ESPN+', note:'Sunday Night Baseball + ALCS', conf:true},
+      {n:'Fox', note:'Saturday Game of the Week + NLCS + World Series', conf:true},
+      {n:'Max', note:'Wild Card & Division Series (TBS games)', conf:true},
+    ],
+    note:'World Series 2024: Los Angeles Dodgers beat New York Yankees 4-1. Dodgers win on Fox.'
+  },
+  {
+    sport:'Premier League', name:'Premier League 2024-25',
+    start:'2024-08-17', end:'2025-05-25',
+    plats:[
+      {n:'Peacock', note:'ALL Premier League matches in the US — exclusive', conf:true},
+    ],
+    note:'Liverpool won the 2024-25 Premier League title. All 380 matches on Peacock.'
+  },
+// ── 2025-26 CURRENT SEASONS ──
+  {
+    sport:'NFL', name:'NFL 2025-26 Season',
+    start:'2025-09-04', end:'2026-02-08',
+    plats:[
+      {n:'Amazon Prime Video', note:'Thursday Night Football — exclusive all season through 2033', conf:true},
+      {n:'Peacock', note:'Sunday Night Football + Super Bowl LX (Feb 8, 2026)', conf:true},
+      {n:'ESPN Unlimited', note:'Monday Night Football on ESPN/ABC streaming flagship', conf:true},
+      {n:'YouTube TV', note:'NFL Sunday Ticket — all out-of-market Sunday afternoon games', conf:true},
+      {n:'Paramount+', note:'AFC Championship + select CBS playoff games', conf:true},
+      {n:'FOX One', note:'NFC Championship + Fox broadcast games', conf:true},
+      {n:'Netflix', note:'Christmas Day games ⚠ TBD for 2025', conf:false},
+    ],
+    note:'Super Bowl LX: Feb 8, 2026 on NBC/Peacock. TNF on Amazon all season. AFC Champ on CBS/Paramount+.'
+  },
+  {
+    sport:'NBA', name:'NBA 2025-26 Season',
+    start:'2025-10-21', end:'2026-06-21',
+    plats:[
+      {n:'Amazon Prime Video', note:'Large game package + NBA Cup knockouts + Play-In exclusive', conf:true},
+      {n:'Peacock', note:'NBC returns after 20+ years: Sunday games + All-Star Weekend', conf:true},
+      {n:'ESPN Unlimited', note:'ESPN/ABC: Finals, Christmas, Wednesday night games', conf:true},
+    ],
+    note:'New $76B rights era. Finals on ESPN Unlimited/ABC. NBA Cup & Play-In on Prime Video. All-Star on NBC/Peacock.'
+  },
+  {
+    sport:'MLB', name:'MLB 2025 & 2026 Seasons',
+    start:'2025-03-27', end:'2026-11-01',
+    plats:[
+      {n:'Apple TV', note:'Friday Night Baseball — 2 free games per Friday (no subscription required)', conf:true},
+      {n:'Peacock', note:'Exclusive Saturday Leadoff game', conf:true},
+      {n:'ESPN Unlimited', note:'Sunday Night Baseball + ALCS', conf:true},
+      {n:'Fox', note:'Saturday Game of the Week + NLCS + World Series', conf:true},
+      {n:'Max', note:'Wild Card + Division Series (TBS games stream on Max)', conf:true},
+    ],
+    note:'162-game regular season. World Series on Fox. Friday Night Baseball free on Apple TV. Sunday Night Baseball on ESPN.'
+  },
+  {
+    sport:'NHL', name:'NHL 2025-26 Season',
+    start:'2025-10-07', end:'2026-06-15',
+    plats:[
+      {n:'ESPN Unlimited', note:'ESPN/ABC package — Stadium Series, select playoffs', conf:true},
+      {n:'Max', note:'TNT/Turner package — Winter Classic, select games', conf:true},
+      {n:'Peacock', note:'Select regular season and playoff games', conf:true},
+    ],
+    note:'Rights split between ESPN Unlimited and Max (TNT) through 2027-28. All-Star 2026 canceled (Olympic year).'
+  },
+  {
+    sport:"Men's CBB", name:"Men's College Basketball 2025-26",
+    start:'2025-11-03', end:'2026-04-06',
+    plats:[
+      {n:'ESPN Unlimited', note:'Primary home — ACC, Big 12, SEC, AAC and most conferences', conf:true},
+      {n:'Peacock', note:'Big Ten regular-season games', conf:true},
+      {n:'Paramount+', note:'March Madness CBS/TBS rounds', conf:true},
+    ],
+    note:'March Madness: CBS/TBS/truTV/Max. Stream via Paramount+ and Max. Free via NCAA March Madness Live app.'
+  },
+  {
+    sport:"Women's CBB", name:"Women's College Basketball 2025-26",
+    start:'2025-11-10', end:'2026-04-05',
+    plats:[
+      {n:'ESPN Unlimited', note:'Primary home for women\'s college basketball', conf:true},
+      {n:'Peacock', note:'Big Ten women\'s games ⚠', conf:false},
+    ],
+    note:"Women's NCAA Tournament on ESPN/ABC → ESPN Unlimited. Record viewership in 2025."
+  },
+  {
+    sport:'MLS', name:'MLS 2025 Season',
+    start:'2025-02-22', end:'2025-12-07',
+    plats:[
+      {n:'Apple TV', note:'ALL MLS games, no blackouts — exclusive through 2032 via MLS Season Pass', conf:true},
+    ],
+    note:'MLS Season Pass: $14.99/mo or $99/yr add-on in the Apple TV app. No other service carries MLS.'
+  },
+  {
+    sport:'Premier League', name:'Premier League 2025-26',
+    start:'2025-08-16', end:'2026-05-24',
+    plats:[
+      {n:'Peacock', note:'ALL Premier League matches in the US — exclusive rights through 2028-29', conf:true},
+    ],
+    note:'NBC/Peacock exclusive US rights since 2013. Peacock Premium required for most matches.'
+  },
+  {
+    sport:'Champions League', name:'UEFA Champions League 2025-26',
+    start:'2025-09-16', end:'2026-05-30',
+    plats:[
+      {n:'Paramount+', note:'All UCL matches — exclusive through 2029-30', conf:true},
+    ],
+    note:'CBS Sports/Paramount+ deal through 2029-30. Select marquee matches also on CBS broadcast.'
+  },
+  {
+    sport:'Europa League', name:'UEFA Europa League 2025-26',
+    start:'2025-09-18', end:'2026-05-20',
+    plats:[
+      {n:'Paramount+', note:'All UEL matches — part of CBS Sports UEFA package', conf:true},
+    ],
+    note:'Bundled with Champions League in CBS Sports/Paramount+ UEFA rights package.'
+  },
+  {
+    sport:'La Liga', name:'La Liga 2025-26',
+    start:'2025-08-15', end:'2026-05-24',
+    plats:[
+      {n:'ESPN Unlimited', note:'All La Liga matches — exclusive deal through 2029', conf:true},
+    ],
+    note:'ESPN exclusive US rights through 2029. Every match including El Clásico on ESPN Unlimited.'
+  },
+  {
+    sport:'Serie A', name:'Serie A 2025-26',
+    start:'2025-08-23', end:'2026-05-31',
+    plats:[
+      {n:'Paramount+', note:'All Serie A matches — exclusive deal', conf:true},
+    ],
+    note:'CBS Sports/Paramount+ has Serie A rights. All 380 matches streamed.'
+  },
+  {
+    sport:'Bundesliga', name:'Bundesliga 2025-26',
+    start:'2025-08-22', end:'2026-05-23',
+    plats:[
+      {n:'ESPN Unlimited', note:'All Bundesliga matches — exclusive deal', conf:true},
+    ],
+    note:'ESPN exclusive Bundesliga US rights. All 306 matches on ESPN Unlimited.'
+  },
+  {
+    sport:'Winter Olympics', name:'2026 Winter Olympics — Milan-Cortina',
+    start:'2026-02-06', end:'2026-02-22',
+    plats:[
+      {n:'Peacock', note:'Full coverage: live events, Gold Zone daily at 8am ET, replays', conf:true},
+    ],
+    note:'NBC/Peacock US rights. Opening Ceremony Feb 6, Closing Feb 22. NHL All-Star 2026 canceled (Olympic year).'
+  },
+];
+
+// ============================================================
+// EVENTS DATA
+// Season cutoff: dates < 2025-08-01 = "2024-25 archive", >= 2025-08-01 = "2025-26 current"
+// ============================================================
+const EVENTS = [
+
+// ══════════════════════════════════════
+// 2024-25 ARCHIVE (dates before Aug 1, 2025)
+// ══════════════════════════════════════
+
+// ── NBA 2024-25 ──
+  {sport:'NBA',name:'NBA Opening Night 2024 — Celtics vs Knicks',date:'2024-10-22',time:'7:30 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Opening Night 2024 — Lakers vs Timberwolves',date:'2024-10-22',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Cup Final 2024',date:'2024-12-14',time:'8:30 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Game 1: Knicks vs Spurs (Netflix)',date:'2024-12-25',time:'12:00 PM',platform:'Netflix',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Game 2 on Netflix',date:'2024-12-25',time:'2:30 PM',platform:'Netflix',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Game 3 on Netflix',date:'2024-12-25',time:'5:00 PM',platform:'Netflix',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Game 4 on Netflix',date:'2024-12-25',time:'8:00 PM',platform:'Netflix',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Game 5 on Netflix',date:'2024-12-25',time:'10:30 PM',platform:'Netflix',conf:true},
+  {sport:'NBA',name:'NBA All-Star Rising Stars 2025 — San Francisco',date:'2025-02-14',time:'9:00 PM',platform:'Max',conf:true},
+  {sport:'NBA',name:'NBA All-Star Saturday Night 2025 — Dunk & 3-Point Contests',date:'2025-02-15',time:'8:00 PM',platform:'Max',conf:true},
+  {sport:'NBA',name:'NBA All-Star Game 2025 — San Francisco',date:'2025-02-16',time:'8:00 PM',platform:'TNT / ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Play-In Tournament 2024-25',date:'2025-04-15',time:'TBD',platform:'Max / ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Playoffs 2024-25 — First Round',date:'2025-04-19',time:'TBD',platform:'ESPN+ / Max',conf:true},
+  {sport:'NBA',name:'NBA Playoffs 2024-25 — Conference Semifinals',date:'2025-05-05',time:'TBD',platform:'ESPN+ / Max',conf:true},
+  {sport:'NBA',name:'NBA Playoffs 2024-25 — Conference Finals',date:'2025-05-19',time:'TBD',platform:'ESPN+ / Max',conf:true},
+  {sport:'NBA',name:'NBA Finals 2024-25',date:'2025-06-05',time:'9:00 PM',platform:'ESPN+',conf:true},
+
+// ── NHL 2024-25 ──
+  {sport:'NHL',name:'NHL 2024-25 Season Opener',date:'2024-10-08',time:'7:00 PM',platform:'ESPN+ / Max',conf:true},
+  {sport:'NHL',name:'NHL Winter Classic 2025',date:'2025-01-01',time:'2:00 PM',platform:'Max',conf:true},
+  {sport:'NHL',name:'NHL All-Star Weekend 2025',date:'2025-02-01',time:'TBD',platform:'ESPN+ / Max',conf:false},
+  {sport:'NHL',name:'NHL Playoffs 2024-25 — First Round',date:'2025-04-19',time:'TBD',platform:'ESPN+ / Max',conf:true},
+  {sport:'NHL',name:'Stanley Cup Final 2024-25',date:'2025-06-03',time:'8:00 PM',platform:'ESPN+',conf:true},
+
+// ── MLB 2024 ──
+  {sport:'MLB',name:'MLB Opening Day 2024',date:'2024-03-28',time:'TBD',platform:'ESPN+ / Fox',conf:true},
+  {sport:'MLB',name:'MLB All-Star Game 2024 — Globe Life Field, Arlington',date:'2024-07-16',time:'8:00 PM',platform:'Fox',conf:true},
+  {sport:'MLB',name:'Wild Card 2024',date:'2024-10-01',time:'TBD',platform:'ESPN+ / Max / Fox',conf:true},
+  {sport:'MLB',name:'Division Series 2024 (ALDS & NLDS)',date:'2024-10-05',time:'TBD',platform:'ESPN+ / Max',conf:true},
+  {sport:'MLB',name:'ALCS 2024',date:'2024-10-15',time:'TBD',platform:'ESPN+',conf:true},
+  {sport:'MLB',name:'NLCS 2024',date:'2024-10-14',time:'TBD',platform:'Fox / FS1',conf:true},
+  {sport:'MLB',name:'2024 World Series — Dodgers vs Yankees, Game 1',date:'2024-10-25',time:'8:08 PM',platform:'Fox',conf:true},
+  {sport:'MLB',name:'2024 World Series — Game 5 (Dodgers clinch)',date:'2024-10-30',time:'8:08 PM',platform:'Fox',conf:true},
+
+// ── NFL 2024-25 Regular Season ──
+  {sport:'NFL',name:'NFL Kickoff 2024 — Chiefs vs Ravens',date:'2024-09-05',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 1 — SNF',date:'2024-09-08',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 1 — MNF',date:'2024-09-09',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 2 — TNF (Amazon)',date:'2024-09-12',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 2 — SNF',date:'2024-09-15',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 2 — MNF',date:'2024-09-16',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 3 — TNF (Amazon)',date:'2024-09-19',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 3 — SNF',date:'2024-09-22',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 3 — MNF',date:'2024-09-23',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 4 — TNF (Amazon)',date:'2024-09-26',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 4 — SNF',date:'2024-09-29',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 4 — MNF',date:'2024-09-30',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 5 — TNF (Amazon)',date:'2024-10-03',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 5 — London Game (Jets vs Vikings)',date:'2024-10-06',time:'9:30 AM',platform:'ESPN+',conf:false},
+  {sport:'NFL',name:'Week 5 — SNF',date:'2024-10-06',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 5 — MNF',date:'2024-10-07',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 6 — TNF (Amazon)',date:'2024-10-10',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 6 — London Game (Jaguars vs Bears)',date:'2024-10-13',time:'9:30 AM',platform:'ESPN+',conf:false},
+  {sport:'NFL',name:'Week 6 — SNF',date:'2024-10-13',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 6 — MNF',date:'2024-10-14',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 7 — TNF (Amazon)',date:'2024-10-17',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 7 — SNF',date:'2024-10-20',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 7 — MNF',date:'2024-10-21',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 8 — TNF (Amazon)',date:'2024-10-24',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 8 — SNF',date:'2024-10-27',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 8 — MNF',date:'2024-10-28',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 9 — TNF (Amazon)',date:'2024-10-31',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 9 — SNF',date:'2024-11-03',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 9 — MNF',date:'2024-11-04',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 10 — TNF (Amazon)',date:'2024-11-07',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 10 — Germany Game (Giants vs Panthers, Munich)',date:'2024-11-10',time:'9:30 AM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 10 — SNF',date:'2024-11-10',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 10 — MNF',date:'2024-11-11',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 11 — TNF (Amazon)',date:'2024-11-14',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 11 — SNF',date:'2024-11-17',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 11 — MNF',date:'2024-11-18',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 12 — TNF (Amazon)',date:'2024-11-21',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 12 — SNF',date:'2024-11-24',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 12 — MNF',date:'2024-11-25',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Thanksgiving 2024 — Game 1: Bears vs Lions (CBS/Paramount+)',date:'2024-11-28',time:'12:30 PM',platform:'Paramount+',conf:true},
+  {sport:'NFL',name:'Thanksgiving 2024 — Game 2: Cowboys vs Giants (Fox)',date:'2024-11-28',time:'4:30 PM',platform:'Fox',conf:false},
+  {sport:'NFL',name:'Thanksgiving 2024 — Game 3: Dolphins vs Packers (NBC/Peacock)',date:'2024-11-28',time:'8:20 PM',platform:'Peacock',conf:false},
+  {sport:'NFL',name:'Week 13 — SNF',date:'2024-12-01',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 13 — MNF',date:'2024-12-02',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 14 — TNF (Amazon)',date:'2024-12-05',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 14 — SNF',date:'2024-12-08',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 14 — MNF',date:'2024-12-09',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 15 — TNF (Amazon)',date:'2024-12-12',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 15 — SNF',date:'2024-12-15',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 15 — MNF',date:'2024-12-16',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 16 — TNF (Amazon)',date:'2024-12-19',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 16 — SNF',date:'2024-12-22',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 16 — MNF',date:'2024-12-23',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Christmas 2024 — Chiefs vs Steelers (Netflix)',date:'2024-12-25',time:'1:00 PM',platform:'Netflix',conf:true},
+  {sport:'NFL',name:'Christmas 2024 — Ravens vs Texans (Netflix)',date:'2024-12-25',time:'4:30 PM',platform:'Netflix',conf:true},
+  {sport:'NFL',name:'Week 17 — SNF',date:'2024-12-29',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 17 — MNF',date:'2024-12-30',time:'8:15 PM',platform:'ESPN+',conf:true},
+  {sport:'NFL',name:'Week 18 — SNF (Regular Season Final)',date:'2025-01-05',time:'8:20 PM',platform:'Peacock',conf:true},
+// ── NFL 2024-25 Playoffs ──
+  {sport:'NFL',name:'NFL Wild Card Weekend 2024-25',date:'2025-01-11',time:'TBD',platform:'Peacock / ESPN+ / Paramount+ / Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'NFL Divisional Playoffs 2024-25',date:'2025-01-18',time:'TBD',platform:'Peacock / ESPN+ / Paramount+',conf:true},
+  {sport:'NFL',name:'AFC Championship 2024-25 — Chiefs (CBS/Paramount+)',date:'2025-01-26',time:'TBD',platform:'Paramount+',conf:true},
+  {sport:'NFL',name:'NFC Championship 2024-25 — Eagles (Fox)',date:'2025-01-26',time:'TBD',platform:'Fox',conf:true},
+  {sport:'NFL',name:'Super Bowl LIX — Eagles beat Chiefs (Fox → free on Tubi)',date:'2025-02-09',time:'6:30 PM',platform:'Tubi',conf:true},
+
+// ── UFC 2025 (Jan–May: ESPN+ under old deal) ──
+  {sport:'UFC',name:'UFC 311 — Makhachev vs Tsarukyan 2 (LW Title)',date:'2025-01-18',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC Fight Night — Dolidze vs Imavov',date:'2025-01-25',time:'7:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 312 — Du Plessis vs Strickland 2 (MW Title)',date:'2025-02-22',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 313 — Pereira vs Ankalaev (LHW Title)',date:'2025-03-08',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 314 — Oliveira vs Chandler 3 (LW)',date:'2025-04-12',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 315 — Belal Muhammad vs Della Maddalena (WW Title)',date:'2025-05-10',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 316 — Paramount+ era begins',date:'2025-06-07',time:'10:00 PM',platform:'Paramount+',conf:true},
+  {sport:'UFC',name:'UFC Fight Night (July 2025)',date:'2025-07-12',time:'7:00 PM',platform:'Paramount+',conf:true},
+
+// ── WWE 2025 PLEs (Peacock) ──
+  {sport:'WWE',name:'WWE Royal Rumble 2025',date:'2025-02-01',time:'7:00 PM',platform:'Peacock',conf:true},
+  {sport:'WWE',name:'WWE Elimination Chamber 2025',date:'2025-03-01',time:'7:00 PM',platform:'Peacock',conf:true},
+  {sport:'WWE',name:'WrestleMania 41 — Night 1',date:'2025-04-19',time:'7:00 PM',platform:'Peacock',conf:true},
+  {sport:'WWE',name:'WrestleMania 41 — Night 2',date:'2025-04-20',time:'7:00 PM',platform:'Peacock',conf:true},
+  {sport:'WWE',name:'WWE Backlash 2025',date:'2025-05-10',time:'7:00 PM',platform:'Peacock',conf:true},
+  {sport:'WWE',name:'WWE Money in the Bank 2025',date:'2025-07-05',time:'7:00 PM',platform:'Peacock',conf:false},
+
+// ── Premier League 2024-25 ──
+  {sport:'Premier League',name:'Premier League 2024-25 — GW1 Season Opener',date:'2024-08-17',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'Premier League 2024-25 — Manchester Derby',date:'2024-12-15',time:'TBD',platform:'Peacock',conf:false},
+  {sport:'Premier League',name:'Premier League 2024-25 — Liverpool vs Man City',date:'2025-03-01',time:'TBD',platform:'Peacock',conf:false},
+  {sport:'Premier League',name:'Premier League 2024-25 — GW38 Final Day (Liverpool title)',date:'2025-05-25',time:'11:00 AM',platform:'Peacock',conf:true},
+
+// ── Champions League 2024-25 ──
+  {sport:'Champions League',name:'UCL Round of 16 — Second Legs 2024-25',date:'2025-03-11',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Champions League',name:'UCL Semi-Finals — First Legs 2024-25',date:'2025-04-29',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Champions League',name:'UEFA Champions League Final 2024-25 (Allianz Arena, Munich)',date:'2025-05-31',time:'3:00 PM',platform:'Paramount+',conf:true},
+
+// ── Europa League 2024-25 ──
+  {sport:'Europa League',name:'UEL Round of 16 — First Legs 2024-25',date:'2025-03-13',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Europa League',name:'UEL Semi-Finals 2024-25',date:'2025-05-01',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Europa League',name:'UEFA Europa League Final 2024-25',date:'2025-05-21',time:'3:00 PM',platform:'Paramount+',conf:true},
+
+// ── La Liga 2024-25 ──
+  {sport:'La Liga',name:'La Liga Final Matchday 2024-25',date:'2025-05-25',time:'3:00 PM',platform:'ESPN+',conf:true},
+
+// ── Bundesliga 2024-25 ──
+  {sport:'Bundesliga',name:'Bundesliga Final Matchday 2024-25',date:'2025-05-17',time:'9:30 AM',platform:'ESPN+',conf:true},
+
+// ── Serie A 2024-25 ──
+  {sport:'Serie A',name:'Serie A Final Matchday 2024-25',date:'2025-05-25',time:'3:00 PM',platform:'Paramount+',conf:true},
+
+// ── MLS 2025 (starts Feb, mostly archive) ──
+  {sport:'MLS',name:'MLS 2025 Season Opener — Week 1',date:'2025-02-22',time:'7:30 PM',platform:'Apple TV',conf:true},
+  {sport:'MLS',name:'MLS All-Star Game 2025',date:'2025-07-23',time:'8:00 PM',platform:'Apple TV',conf:false},
+
+// ══════════════════════════════════════
+// 2025-26 CURRENT (dates from Aug 1, 2025 onward)
+// ══════════════════════════════════════
+
+// ── UFC 2025-26 (Paramount+) ──
+  {sport:'UFC',name:'UFC Fight Night (August 2025)',date:'2025-08-02',time:'7:00 PM',platform:'Paramount+',conf:false},
+  {sport:'UFC',name:'UFC 317 — PPV',date:'2025-08-30',time:'10:00 PM',platform:'Paramount+',conf:false},
+  {sport:'UFC',name:'UFC 318 — PPV',date:'2025-10-04',time:'10:00 PM',platform:'Paramount+',conf:true},
+  {sport:'UFC',name:'UFC 319 — PPV',date:'2025-11-01',time:'10:00 PM',platform:'Paramount+',conf:true},
+  {sport:'UFC',name:'UFC 320 — Year-End PPV',date:'2025-12-06',time:'10:00 PM',platform:'Paramount+',conf:true},
+  {sport:'UFC',name:'UFC 321 — PPV (Jan 2026)',date:'2026-01-17',time:'10:00 PM',platform:'Paramount+',conf:false},
+  {sport:'UFC',name:'UFC 322 — PPV (Feb 2026)',date:'2026-02-21',time:'10:00 PM',platform:'Paramount+',conf:false},
+
+// ── WWE 2025-26 ──
+  {sport:'WWE',name:'WWE SummerSlam 2025',date:'2025-08-02',time:'7:00 PM',platform:'Peacock',conf:false},
+  {sport:'WWE',name:'WWE Bash in Berlin 2025',date:'2025-08-23',time:'2:00 PM',platform:'Peacock',conf:false},
+  {sport:'WWE',name:'WWE Bad Blood 2025',date:'2025-10-04',time:'7:00 PM',platform:'Peacock',conf:false},
+  {sport:'WWE',name:'WWE Crown Jewel 2025 (Saudi Arabia)',date:'2025-11-01',time:'1:00 PM',platform:'Peacock',conf:false},
+  {sport:'WWE',name:'WWE Survivor Series 2025',date:'2025-11-29',time:'7:00 PM',platform:'Peacock',conf:false},
+  {sport:'WWE',name:'WWE Royal Rumble 2026',date:'2026-02-01',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE Elimination Chamber 2026',date:'2026-03-01',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WrestleMania 42 — Night 1 (Allegiant Stadium, Las Vegas)',date:'2026-04-18',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WrestleMania 42 — Night 2 (Allegiant Stadium, Las Vegas)',date:'2026-04-19',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE Backlash 2026 (Tampa)',date:'2026-05-09',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE Clash in Italy 2026 (Turin)',date:'2026-05-31',time:'2:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE Night of Champions 2026 (Saudi Arabia)',date:'2026-06-27',time:'1:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE SummerSlam 2026 — Night 1 (Minneapolis)',date:'2026-08-01',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE SummerSlam 2026 — Night 2 (Minneapolis)',date:'2026-08-02',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE Money in the Bank 2026 (New Orleans)',date:'2026-09-06',time:'7:00 PM',platform:'Netflix',conf:true},
+  {sport:'WWE',name:'WWE Crown Jewel 2026 (Saudi Arabia)',date:'2026-10-31',time:'1:00 PM',platform:'Netflix',conf:false},
+  {sport:'WWE',name:'WWE Survivor Series 2026',date:'2026-11-28',time:'7:00 PM',platform:'Netflix',conf:false},
+
+// ── NFL 2025-26 ──
+  {sport:'NFL',name:'NFL Kickoff 2025 — Opening Night',date:'2025-09-04',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 1 — SNF',date:'2025-09-07',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 1 — MNF',date:'2025-09-08',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 2 — TNF (Amazon)',date:'2025-09-11',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 2 — SNF',date:'2025-09-14',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 2 — MNF',date:'2025-09-15',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 3 — TNF (Amazon)',date:'2025-09-18',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 3 — SNF',date:'2025-09-21',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 3 — MNF',date:'2025-09-22',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 4 — TNF (Amazon)',date:'2025-09-25',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 4 — SNF',date:'2025-09-28',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 4 — MNF',date:'2025-09-29',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 5 — TNF (Amazon)',date:'2025-10-02',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 5 — London Game',date:'2025-10-05',time:'9:30 AM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 5 — SNF',date:'2025-10-05',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 5 — MNF',date:'2025-10-06',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 6 — TNF (Amazon)',date:'2025-10-09',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 6 — SNF',date:'2025-10-12',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 6 — MNF',date:'2025-10-13',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 7 — TNF (Amazon)',date:'2025-10-16',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 7 — SNF',date:'2025-10-19',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 7 — MNF',date:'2025-10-20',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 8 — TNF (Amazon)',date:'2025-10-23',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 8 — SNF',date:'2025-10-26',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 8 — MNF',date:'2025-10-27',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 9 — TNF (Amazon)',date:'2025-10-30',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 9 — SNF',date:'2025-11-02',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 9 — MNF',date:'2025-11-03',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 10 — TNF (Amazon)',date:'2025-11-06',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 10 — Munich International Game',date:'2025-11-09',time:'9:30 AM',platform:'ESPN Unlimited',conf:false},
+  {sport:'NFL',name:'Week 10 — SNF',date:'2025-11-09',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 10 — MNF',date:'2025-11-10',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 11 — TNF (Amazon)',date:'2025-11-13',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 11 — SNF',date:'2025-11-16',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 11 — MNF',date:'2025-11-17',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 12 — TNF (Amazon)',date:'2025-11-20',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 12 — SNF',date:'2025-11-23',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 12 — MNF',date:'2025-11-24',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Thanksgiving — Game 1 (Fox)',date:'2025-11-27',time:'12:30 PM',platform:'FOX One',conf:true},
+  {sport:'NFL',name:'Thanksgiving — Game 2 (NBC/Peacock)',date:'2025-11-27',time:'4:30 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Thanksgiving — Game 3 (Amazon TNF)',date:'2025-11-27',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 13 — SNF',date:'2025-11-30',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 13 — MNF',date:'2025-12-01',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 14 — TNF (Amazon)',date:'2025-12-04',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 14 — SNF',date:'2025-12-07',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 14 — MNF',date:'2025-12-08',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 15 — TNF (Amazon)',date:'2025-12-11',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 15 — SNF',date:'2025-12-14',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 15 — MNF',date:'2025-12-15',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 16 — TNF (Amazon)',date:'2025-12-18',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 16 — SNF',date:'2025-12-21',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 16 — MNF',date:'2025-12-22',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 17 — Christmas Day Games',date:'2025-12-25',time:'TBD',platform:'Netflix',conf:false},
+  {sport:'NFL',name:'Week 17 — SNF',date:'2025-12-28',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 17 — MNF',date:'2025-12-29',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 18 — TNF (Amazon)',date:'2026-01-01',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 18 — SNF (Final)',date:'2026-01-04',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 18 — MNF (Final)',date:'2026-01-05',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Wild Card Weekend 2025-26',date:'2026-01-10',time:'TBD',platform:'Peacock / Amazon Prime Video / Paramount+ / ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Divisional Playoffs 2025-26',date:'2026-01-17',time:'TBD',platform:'Peacock / Paramount+ / ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'AFC Championship Game',date:'2026-01-25',time:'TBD',platform:'Paramount+',conf:true},
+  {sport:'NFL',name:'NFC Championship Game (Fox)',date:'2026-01-25',time:'TBD',platform:'FOX One',conf:true},
+  {sport:'NFL',name:'Super Bowl LX — NBC/Peacock',date:'2026-02-08',time:'6:30 PM',platform:'Peacock',conf:true},
+
+// ── MLB 2025 ──
+  {sport:'MLB',name:'MLB Opening Day 2025',date:'2025-03-27',time:'TBD',platform:'ESPN Unlimited / Fox',conf:true},
+  {sport:'MLB',name:'Friday Night Baseball — Apr 4',date:'2025-04-04',time:'7:00 PM',platform:'Apple TV',conf:true},
+  {sport:'MLB',name:'Saturday Leadoff — Apr 5',date:'2025-04-05',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'MLB',name:'Sunday Night Baseball — Apr 6',date:'2025-04-06',time:'7:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'MLB',name:'Friday Night Baseball — May 2',date:'2025-05-02',time:'7:00 PM',platform:'Apple TV',conf:true},
+  {sport:'MLB',name:'Saturday Leadoff — May 3',date:'2025-05-03',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'MLB',name:'Sunday Night Baseball — May 4',date:'2025-05-04',time:'7:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'MLB',name:'Friday Night Baseball — Jun 6',date:'2025-06-06',time:'7:00 PM',platform:'Apple TV',conf:true},
+  {sport:'MLB',name:'Saturday Leadoff — Jun 7',date:'2025-06-07',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'MLB',name:'MLB All-Star Home Run Derby 2025',date:'2025-07-14',time:'8:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'MLB',name:'MLB All-Star Game 2025 — Atlanta, Truist Park',date:'2025-07-15',time:'8:00 PM',platform:'Fox',conf:true},
+  {sport:'MLB',name:'Friday Night Baseball — Aug 1',date:'2025-08-01',time:'7:00 PM',platform:'Apple TV',conf:true},
+  {sport:'MLB',name:'Saturday Leadoff — Aug 2',date:'2025-08-02',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'MLB',name:'Sunday Night Baseball — Aug 3',date:'2025-08-03',time:'7:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'MLB',name:'Wild Card Series 2025',date:'2025-10-01',time:'TBD',platform:'ESPN Unlimited / Fox / Max',conf:true},
+  {sport:'MLB',name:'Division Series 2025 (ALDS & NLDS)',date:'2025-10-04',time:'TBD',platform:'ESPN Unlimited / Max',conf:true},
+  {sport:'MLB',name:'ALCS 2025',date:'2025-10-14',time:'TBD',platform:'ESPN Unlimited',conf:true},
+  {sport:'MLB',name:'NLCS 2025',date:'2025-10-14',time:'TBD',platform:'Fox / FS1',conf:true},
+  {sport:'MLB',name:'World Series 2025 — Game 1',date:'2025-10-24',time:'8:08 PM',platform:'Fox',conf:true},
+  {sport:'MLB',name:'MLB Opening Day 2026',date:'2026-03-26',time:'TBD',platform:'ESPN Unlimited / Fox',conf:false},
+  {sport:'MLB',name:'MLB All-Star Game 2026',date:'2026-07-14',time:'8:00 PM',platform:'Fox',conf:false},
+
+// ── MLS 2025 (current portion) ──
+  {sport:'MLS',name:'MLS Cup Playoffs — First Round',date:'2025-10-25',time:'TBD',platform:'Apple TV',conf:true},
+  {sport:'MLS',name:'MLS Cup Final 2025',date:'2025-12-07',time:'4:00 PM',platform:'Apple TV',conf:true},
+
+// ── PREMIER LEAGUE 2025-26 ──
+  {sport:'Premier League',name:'GW1 — All 10 matches',date:'2025-08-16',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW2 — All 10 matches',date:'2025-08-23',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW3 — All 10 matches',date:'2025-08-30',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW4 — All 10 matches',date:'2025-09-13',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW5 — All 10 matches',date:'2025-09-20',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW6 — All 10 matches',date:'2025-09-27',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW7 — All 10 matches',date:'2025-10-04',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW8 — All 10 matches',date:'2025-10-18',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW9 — All 10 matches',date:'2025-10-25',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW10 — All 10 matches',date:'2025-11-01',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW11 — All 10 matches',date:'2025-11-08',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW12 — All 10 matches',date:'2025-11-22',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW13 — All 10 matches',date:'2025-11-29',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW14 — Midweek matches',date:'2025-12-03',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW15 — All 10 matches',date:'2025-12-06',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW16 — All 10 matches',date:'2025-12-13',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW17 — All 10 matches',date:'2025-12-20',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW18 — Boxing Day matches',date:'2025-12-26',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW19 — All 10 matches',date:'2025-12-28',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:"GW20 — New Year's Day matches",date:'2026-01-01',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW21 — Midweek matches',date:'2026-01-04',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW22 — All 10 matches',date:'2026-01-14',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW23 — Midweek matches',date:'2026-01-18',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW24 — All 10 matches',date:'2026-01-25',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW25 — All 10 matches',date:'2026-02-04',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Midweek matches',date:'2026-02-07',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — All 10 matches',date:'2026-02-21',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW28 — Midweek matches',date:'2026-02-25',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW29 — All 10 matches',date:'2026-03-07',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW30 — All 10 matches',date:'2026-03-14',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW31 — All 10 matches',date:'2026-04-04',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW32 — All 10 matches',date:'2026-04-11',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW33 — All 10 matches',date:'2026-04-18',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW34 — All 10 matches',date:'2026-04-25',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW35 — All 10 matches',date:'2026-05-02',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW36 — All 10 matches',date:'2026-05-09',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW37 — All 10 matches',date:'2026-05-16',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW38 — Final Day (all concurrent)',date:'2026-05-24',time:'11:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'Manchester Derby (approx.)',date:'2025-11-08',time:'TBD',platform:'Peacock',conf:false},
+  {sport:'Premier League',name:'North London Derby — Arsenal vs Spurs (approx.)',date:'2025-11-01',time:'TBD',platform:'Peacock',conf:false},
+  {sport:'Premier League',name:'Liverpool vs Man City (approx.)',date:'2025-11-22',time:'TBD',platform:'Peacock',conf:false},
+
+// ── NBA 2025-26 ──
+  {sport:'NBA',name:'NBA Opening Night 2025',date:'2025-10-21',time:'7:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'NBA Cup — Group Play Begins',date:'2025-11-04',time:'TBD',platform:'ESPN Unlimited / Amazon Prime Video / Peacock',conf:true},
+  {sport:'NBA',name:'NBA Cup — Quarterfinals & Semifinals (Prime exclusive)',date:'2025-12-09',time:'TBD',platform:'Amazon Prime Video',conf:true},
+  {sport:'NBA',name:'NBA Cup Final (Prime exclusive)',date:'2025-12-13',time:'TBD',platform:'Amazon Prime Video',conf:true},
+  {sport:'NBA',name:'NBA Christmas Day Games (ESPN/ABC)',date:'2025-12-25',time:'12:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'NBA All-Star Saturday Night (NBC/Peacock)',date:'2026-02-14',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'NBA All-Star Game 2026 (NBC/Peacock)',date:'2026-02-15',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'NBA Play-In Tournament (Prime Video exclusive)',date:'2026-04-14',time:'TBD',platform:'Amazon Prime Video',conf:true},
+  {sport:'NBA',name:'NBA Playoffs 2025-26 — First Round',date:'2026-04-18',time:'TBD',platform:'ESPN Unlimited / Amazon Prime Video / Peacock',conf:true},
+  {sport:'NBA',name:'NBA Finals 2026 (ABC/ESPN Unlimited)',date:'2026-06-04',time:'9:00 PM',platform:'ESPN Unlimited',conf:true},
+
+// ── NHL 2025-26 ──
+  {sport:'NHL',name:'NHL 2025-26 Season Opener',date:'2025-10-07',time:'7:00 PM',platform:'ESPN Unlimited / Max',conf:true},
+  {sport:'NHL',name:'NHL Winter Classic 2026 (Max/TNT)',date:'2026-01-01',time:'2:00 PM',platform:'Max',conf:true},
+  {sport:'NHL',name:'NHL Stadium Series 2026 — Bruins @ Lightning (Raymond James)',date:'2026-02-01',time:'8:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NHL',name:'NHL Playoffs 2025-26 — First Round',date:'2026-04-18',time:'TBD',platform:'ESPN Unlimited / Max / Peacock',conf:true},
+  {sport:'NHL',name:'Stanley Cup Final 2026 (ABC/ESPN Unlimited year)',date:'2026-05-25',time:'8:00 PM',platform:'ESPN Unlimited',conf:true},
+
+// ── MEN'S CBB 2025-26 ──
+  {sport:"Men's CBB",name:"Men's College Basketball — Season Tip-Off",date:'2025-11-03',time:'TBD',platform:'ESPN Unlimited',conf:true},
+  {sport:"Men's CBB",name:"Big Ten Men's Tournament",date:'2026-03-04',time:'TBD',platform:'Peacock',conf:false},
+  {sport:"Men's CBB",name:'NCAA Tournament — First Four',date:'2026-03-17',time:'TBD',platform:'Paramount+',conf:false},
+  {sport:"Men's CBB",name:'NCAA Tournament — First & Second Rounds',date:'2026-03-19',time:'TBD',platform:'Paramount+',conf:false},
+  {sport:"Men's CBB",name:"NCAA Men's Final Four",date:'2026-04-04',time:'6:09 PM',platform:'Paramount+',conf:false},
+  {sport:"Men's CBB",name:"NCAA Men's Championship Game",date:'2026-04-06',time:'9:20 PM',platform:'Paramount+',conf:false},
+
+// ── WOMEN'S CBB 2025-26 ──
+  {sport:"Women's CBB",name:"Women's College Basketball — Season Tip-Off",date:'2025-11-10',time:'TBD',platform:'ESPN Unlimited',conf:true},
+  {sport:"Women's CBB",name:"NCAA Women's Tournament — First Round",date:'2026-03-20',time:'TBD',platform:'ESPN Unlimited',conf:true},
+  {sport:"Women's CBB",name:"NCAA Women's Final Four",date:'2026-04-03',time:'TBD',platform:'ESPN Unlimited',conf:true},
+  {sport:"Women's CBB",name:"NCAA Women's Championship Game",date:'2026-04-05',time:'TBD',platform:'ESPN Unlimited',conf:true},
+
+// ── CHAMPIONS LEAGUE 2025-26 ──
+  {sport:'Champions League',name:'UCL 2025-26 League Phase Begins',date:'2025-09-16',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Champions League',name:'UCL Round of 16 — 2025-26',date:'2026-02-17',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Champions League',name:'UCL Semi-Finals 2025-26',date:'2026-04-28',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Champions League',name:'UCL Final 2025-26',date:'2026-05-30',time:'3:00 PM',platform:'Paramount+',conf:true},
+
+// ── EUROPA LEAGUE 2025-26 ──
+  {sport:'Europa League',name:'UEFA Europa League 2025-26 Begins',date:'2025-09-18',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'Europa League',name:'UEFA Europa League Final 2025-26',date:'2026-05-20',time:'3:00 PM',platform:'Paramount+',conf:true},
+
+// ── LA LIGA 2025-26 ──
+  {sport:'La Liga',name:'La Liga 2025-26 Season Opener',date:'2025-08-15',time:'3:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'La Liga',name:'El Clásico 2025-26 (approx.)',date:'2025-10-25',time:'3:00 PM',platform:'ESPN Unlimited',conf:false},
+  {sport:'La Liga',name:'La Liga Final Matchday 2025-26',date:'2026-05-24',time:'3:00 PM',platform:'ESPN Unlimited',conf:true},
+
+// ── BUNDESLIGA 2025-26 ──
+  {sport:'Bundesliga',name:'Bundesliga 2025-26 Season Opener',date:'2025-08-22',time:'2:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'Bundesliga',name:'Der Klassiker: Bayern vs Dortmund (approx.)',date:'2025-11-08',time:'12:30 PM',platform:'ESPN Unlimited',conf:false},
+  {sport:'Bundesliga',name:'Bundesliga Final Matchday 2025-26',date:'2026-05-23',time:'9:30 AM',platform:'ESPN Unlimited',conf:true},
+
+// ── SERIE A 2025-26 ──
+  {sport:'Serie A',name:'Serie A 2025-26 Season Opener',date:'2025-08-23',time:'2:45 PM',platform:'Paramount+',conf:true},
+  {sport:'Serie A',name:'Serie A Final Matchday 2025-26',date:'2026-05-31',time:'3:00 PM',platform:'Paramount+',conf:true},
+
+// ── WINTER OLYMPICS 2026 ──
+  {sport:'Winter Olympics',name:'2026 Winter Olympics — Opening Ceremony',date:'2026-02-06',time:'2:00 PM',platform:'Peacock',conf:true},
+  {sport:'Winter Olympics',name:'2026 Winter Olympics — Daily coverage',date:'2026-02-07',time:'8:00 AM',platform:'Peacock',conf:true},
+  {sport:'Winter Olympics',name:'2026 Winter Olympics — Closing Ceremony',date:'2026-02-22',time:'2:00 PM',platform:'Peacock',conf:true},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let _filtered = [...EVENTS];
+let _tlYear = new Date().getFullYear();
+const ARCHIVE_CUTOFF = '2025-08-01';
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmtDate(s) {
+  if (!s || s === 'TBD') return 'TBD';
+  return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtDateShort(s) {
+  if (!s || s === 'TBD') return 'TBD';
+  return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function getStatus(start, end) {
+  const now=new Date(), s=new Date(start+'T00:00:00'), e=new Date(end+'T23:59:59');
+  if(now>=s&&now<=e) return {label:'● In Season',cls:'s-active'};
+  if(now<s) return {label:'◆ Upcoming',cls:'s-upcoming'};
+  return {label:'○ Off Season',cls:'s-off'};
+}
+function allSports() { return [...new Set(EVENTS.map(e=>e.sport))].sort(); }
+function allPlatforms() {
+  const s=new Set();
+  EVENTS.forEach(e=>e.platform.split('/').forEach(p=>s.add(p.trim())));
+  SEASONS.forEach(s2=>s2.plats.forEach(p=>s.add(p.n)));
+  return [...s].sort();
+}
+function pillHtml(sport) {
+  const c=sc(sport);
+  return `<span class="sport-pill" style="background:${c.bg};color:${c.tx}">${sport}</span>`;
+}
+function platChips(platform) {
+  return platform.split('/').map(p=>`<span class="plat-chip">${p.trim()}</span>`).join('');
+}
+
+// ============================================================
+// PAGE 1 — TIMELINE (12-month cyclical — year-agnostic)
+// ============================================================
+function renderTimeline() {
+  // One row per unique sport — use most recent season for month positions
+  const seen = new Set(), sportSeasons = [];
+  [...SEASONS].reverse().forEach(s => {
+    if (!seen.has(s.sport)) { seen.add(s.sport); sportSeasons.unshift(s); }
+  });
+  const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mHtml = MN.map(m=>`<div class="tl-month">${m}</div>`).join('');
+  const rows = sportSeasons.map(s => {
+    const c  = sc(s.sport);
+    const sM = new Date(s.start+'T12:00:00').getMonth(); // 0-11
+    const eM = new Date(s.end  +'T12:00:00').getMonth(); // 0-11
+    const tip = sM <= eM
+      ? `${s.sport}: ${MN[sM]} – ${MN[eM]}`
+      : `${s.sport}: ${MN[sM]} – Dec / Jan – ${MN[eM]}`;
+    let bars;
+    if (sM <= eM) {
+      const l = (sM/12*100).toFixed(1), w = ((eM-sM+1)/12*100).toFixed(1);
+      bars = `<div class="tl-bar" style="left:${l}%;width:${w}%;background:${c.bg};color:${c.tx}" title="${tip}">${s.sport}</div>`;
+    } else {
+      // Season wraps Jan — show two segments
+      const l1=(sM/12*100).toFixed(1), w1=((12-sM)/12*100).toFixed(1);
+      const w2=((eM+1)/12*100).toFixed(1);
+      bars = `<div class="tl-bar" style="left:${l1}%;width:${w1}%;background:${c.bg};color:${c.tx}" title="${tip}">${s.sport}</div>
+        <div class="tl-bar" style="left:0%;width:${w2}%;background:${c.bg};color:${c.tx};opacity:.7" title="${tip}"></div>`;
+    }
+    return `<div class="tl-row">
+      <div class="tl-lbl" title="${tip}">${s.sport}</div>
+      <div class="tl-track">${bars}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('tl-container').innerHTML =
+    `<div class="tl-heading">Season Calendar — hover a bar to see active months</div>
+    <div class="tl-scroll"><div class="tl-inner">
+      <div class="tl-months">${mHtml}</div>
+      ${rows}
+    </div></div>`;
+}
+
+// ============================================================
+// PAGE 1 — SEASONS
+// ============================================================
+function renderSeasons() {
+  const seen = new Set(), toShow = [];
+  [...SEASONS].reverse().forEach(s => {
+    if (!seen.has(s.sport)) { seen.add(s.sport); toShow.unshift(s); }
+  });
+  document.getElementById('season-grid').innerHTML = toShow.map(s => {
+    const c  = sc(s.sport);
+    const st = getStatus(s.start, s.end);
+    const plats = s.plats.map(p=>
+      `<span class="plat-tag${p.conf?'':' unc'}" title="${p.note}">${p.n}</span>`
+    ).join('');
+    return `<div class="season-card">
+      <div class="card-top">
+        <span class="sport-badge" style="background:${c.bg};color:${c.tx}">${s.sport}</span>
+        <div class="card-info"><div class="card-title">${s.name}</div></div>
+        <span class="status-pill ${st.cls}">${st.label}</span>
+      </div>
+      <div class="card-dates">
+        <div class="date-box"><label>Start</label><span>${fmtDate(s.start)}</span></div>
+        <div class="date-box"><label>End</label><span>${fmtDate(s.end)}</span></div>
+      </div>
+      <hr class="card-divider">
+      <div class="plat-label">Streaming Platforms</div>
+      <div class="plat-tags">${plats}</div>
+      ${s.note?`<div class="card-note">${s.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// PAGE 2 — CALENDAR (sport-by-sport)
+// ============================================================
+function populateFilters() {
+  const ss=document.getElementById('s-sport');
+  const sp=document.getElementById('s-plat');
+  const sm=document.getElementById('s-month');
+  allSports().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o);});
+  allPlatforms().forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sp.appendChild(o);});
+  const months=new Set();
+  EVENTS.forEach(e=>{if(e.date&&e.date!=='TBD'){const d=new Date(e.date+'T12:00:00');months.add(d.toISOString().substring(0,7));}});
+  [...months].sort().forEach(m=>{
+    const d=new Date(m+'-01T12:00:00');
+    const o=document.createElement('option');
+    o.value=m;
+    o.textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    sm.appendChild(o);
+  });
+}
+function applyFilters() {
+  const q   = document.getElementById('s-search').value.toLowerCase();
+  const sp  = document.getElementById('s-sport').value;
+  const pl  = document.getElementById('s-plat').value;
+  const mo  = document.getElementById('s-month').value;
+  const seas= document.getElementById('s-season').value;
+  const banner = document.getElementById('archive-banner');
+  banner.style.display = seas === 'archive' ? 'block' : 'none';
+  _filtered = EVENTS.filter(e => {
+    const isArchive = e.date < ARCHIVE_CUTOFF;
+    if (seas === 'archive'  && !isArchive) return false;
+    if (seas === 'current'  &&  isArchive) return false;
+    if (q  && !e.name.toLowerCase().includes(q) && !e.sport.toLowerCase().includes(q)) return false;
+    if (sp && e.sport !== sp) return false;
+    if (pl && !e.platform.includes(pl)) return false;
+    if (mo && !e.date.startsWith(mo)) return false;
+    return true;
+  });
+  renderBySport(_filtered.slice().sort((a,b)=>a.date.localeCompare(b.date)));
+}
+function resetFilters() {
+  ['s-search','s-sport','s-plat','s-month'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('s-season').value = 'current';
+  applyFilters();
+}
+function renderBySport(evts) {
+  const container = document.getElementById('sport-sections');
+  const nr        = document.getElementById('no-results');
+  document.getElementById('results-info').textContent = `Showing ${evts.length} of ${EVENTS.length} events`;
+  if (!evts.length) { container.innerHTML=''; nr.style.display='block'; return; }
+  nr.style.display='none';
+  const sportOrder = [...new Set(EVENTS.map(e=>e.sport))];
+  const bySport = {};
+  evts.forEach(e=>{(bySport[e.sport]=bySport[e.sport]||[]).push(e);});
+  container.innerHTML = sportOrder.filter(s=>bySport[s]).map(sport=>{
+    const c    = sc(sport);
+    const list = bySport[sport];
+    const rows = list.map(e=>{
+      const unc = !e.conf?`<span class="unc-flag" title="Verify platform">⚠</span>`:'';
+      return `<div class="sport-event-row">
+        <span class="se-date">${fmtDateShort(e.date)}</span>
+        <span class="se-name">${e.name}${unc}</span>
+        <span class="se-plats">${platChips(e.platform)}</span>
+      </div>`;
+    }).join('');
+    return `<div class="sport-section">
+      <div class="sport-sec-hdr" onclick="toggleSection(this)">
+        <span class="sport-pill" style="background:${c.bg};color:${c.tx}">${sport}</span>
+        <span class="sport-sec-count">${list.length} event${list.length!==1?'s':''}</span>
+        <span class="sport-sec-toggle">▼</span>
+      </div>
+      <div class="sport-sec-body">${rows}</div>
+    </div>`;
+  }).join('');
+}
+function toggleSection(hdr) {
+  const body=hdr.nextElementSibling;
+  const tog=hdr.querySelector('.sport-sec-toggle');
+  const hidden=body.style.display==='none';
+  body.style.display=hidden?'':'none';
+  tog.textContent=hidden?'▼':'▶';
+}
+
+// ============================================================
+// PAGE 3 — LOOKUP
+// ============================================================
+function populateLookupSelect() {
+  const sel=document.getElementById('lk-sel');
+  allPlatforms().forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o);});
+}
+function renderLookup() {
+  const plat=document.getElementById('lk-sel').value;
+  const out=document.getElementById('lk-results');
+  if(!plat){out.innerHTML='';return;}
+  const evts=EVENTS.filter(e=>e.platform.split('/').map(x=>x.trim()).includes(plat));
+  const seas=SEASONS.filter(s=>s.plats.some(p=>p.n===plat));
+  if(!evts.length&&!seas.length){out.innerHTML=`<div class="lk-empty">No coverage found for <strong>${plat}</strong>.</div>`;return;}
+  const bySport={};
+  evts.forEach(e=>{(bySport[e.sport]=bySport[e.sport]||[]).push(e);});
+  let html=`<div class="lk-header">
+    <span class="lk-plat-name">${plat}</span>
+    <span class="lk-count">${evts.length} events · ${seas.length} full-season packages</span>
+  </div>`;
+  if(seas.length){
+    html+=`<div class="lk-group"><div class="lk-group-hdr">📦 Full Season Packages (${seas.length})</div>`;
+    seas.forEach(s=>{
+      const pi=s.plats.find(p=>p.n===plat);
+      html+=`<div class="lk-item">${pillHtml(s.sport)}<div class="lk-name"><strong>${s.name}</strong>${pi&&pi.note?`<br><small style="color:var(--text-muted)">${pi.note}</small>`:''}</div><span class="lk-meta">${fmtDate(s.start)} – ${fmtDate(s.end)}</span></div>`;
+    });
+    html+='</div>';
+  }
+  Object.keys(bySport).sort().forEach(sport=>{
+    const list=bySport[sport].sort((a,b)=>a.date.localeCompare(b.date));
+    html+=`<div class="lk-group"><div class="lk-group-hdr">${pillHtml(sport)} ${list.length} event${list.length!==1?'s':''}</div>`;
+    list.forEach(e=>{
+      const unc=!e.conf?` <span style="color:#f59e0b;font-size:11px">⚠</span>`:'';
+      html+=`<div class="lk-item"><div class="lk-name">${e.name}${unc}</div><span class="lk-meta">${fmtDate(e.date)}${e.time&&e.time!=='TBD'?' · '+e.time:''}</span></div>`;
+    });
+    html+='</div>';
+  });
+  out.innerHTML=html;
+}
+
+// ============================================================
+// NAV
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const map={seasons:0,calendar:1,lookup:2};
+  document.querySelectorAll('.nav-link')[map[id]].classList.add('active');
+  window.scrollTo(0,0);
+}
+function toggleDark() {
+  const html=document.documentElement;
+  const dark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('darkBtn').textContent=dark?'🌙':'☀️';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded',()=>{
+  renderTimeline();
+  renderSeasons();
+  populateFilters();
+  populateLookupSelect();
+  applyFilters();
+});
+</script>
+</body>
+</html>
