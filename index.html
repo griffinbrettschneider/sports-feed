@@ -100,6 +100,8 @@ nav{position:sticky;top:0;z-index:1000;background:var(--bg-nav);padding:0 20px;d
 .sport-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap}
 .plat-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);white-space:nowrap;margin:1px}
 .unc-flag{font-size:11px;margin-left:3px;cursor:help;color:#f59e0b}
+.excl-star{display:inline-block;font-size:9.5px;margin-left:4px;padding:1px 5px;border-radius:3px;background:rgba(129,140,248,.18);color:var(--accent);font-weight:800;letter-spacing:.3px;cursor:help;vertical-align:middle;text-transform:uppercase}
+[data-theme="dark"] .excl-star{background:rgba(129,140,248,.25)}
 .no-results{text-align:center;padding:48px;color:var(--text-muted);font-size:15px}
 /* LOOKUP */
 .lookup-wrap{max-width:780px;margin:0 auto}
@@ -207,9 +209,6 @@ const SC = {
   'Premier League':  {bg:'#3d195b',tx:'#fff'},
   'Champions League':{bg:'#1b4fba',tx:'#fff'},
   'Europa League':   {bg:'#e05c00',tx:'#fff'},
-  'La Liga':         {bg:'#be1522',tx:'#fff'},
-  'Serie A':         {bg:'#024494',tx:'#fff'},
-  'Bundesliga':      {bg:'#c0010d',tx:'#fff'},
   'UFC':             {bg:'#b91c1c',tx:'#fff'},
   'WWE':             {bg:'#cc0000',tx:'#fff'},
   'Winter Olympics': {bg:'#0081c8',tx:'#fff'},
@@ -237,11 +236,10 @@ const SEASONS = [
     sport:'NBA', name:'NBA 2024-25 Season',
     start:'2024-10-22', end:'2025-06-22',
     plats:[
-      {n:'ESPN+', note:'ESPN/ABC package games', conf:true},
-      {n:'Max', note:'TNT package games — Warner Bros. Discovery deal', conf:true},
-      {n:'Netflix', note:'Christmas Day 2024 games — historic NBA debut on Netflix', conf:true},
+      {n:'ESPN+', note:'ESPN/ABC package — Wednesday nights, Sunday Showcase, Finals (ABC)', conf:true},
+      {n:'Max', note:'TNT package games — final season under Warner Bros. Discovery deal', conf:true},
     ],
-    note:'Final season under old TV deal. Netflix debuted NBA Christmas games Dec 25, 2024. New $76B deal starts 2025-26.'
+    note:'Final season under old TV deal (ESPN/ABC + TNT/Max). Christmas 2024 on ABC/ESPN (NOT Netflix). OKC Thunder defeated Indiana Pacers 4-3 to win Finals. New $76B deal starts 2025-26.'
   },
   {
     sport:'NHL', name:'NHL 2024-25 Season',
@@ -284,7 +282,7 @@ const SEASONS = [
       {n:'YouTube TV', note:'NFL Sunday Ticket — all out-of-market Sunday afternoon games', conf:true},
       {n:'Paramount+', note:'AFC Championship + select CBS playoff games', conf:true},
       {n:'FOX One', note:'NFC Championship + Fox broadcast games', conf:true},
-      {n:'Netflix', note:'Christmas Day games ⚠ TBD for 2025', conf:false},
+      {n:'Netflix', note:'Christmas Day games — Cowboys at WAS + Lions at MIN (2 games)', conf:true},
     ],
     note:'Super Bowl LX: Feb 8, 2026 on NBC/Peacock. TNF on Amazon all season. AFC Champ on CBS/Paramount+.'
   },
@@ -372,30 +370,6 @@ const SEASONS = [
     note:'Bundled with Champions League in CBS Sports/Paramount+ UEFA rights package.'
   },
   {
-    sport:'La Liga', name:'La Liga 2025-26',
-    start:'2025-08-15', end:'2026-05-24',
-    plats:[
-      {n:'ESPN Unlimited', note:'All La Liga matches — exclusive deal through 2029', conf:true},
-    ],
-    note:'ESPN exclusive US rights through 2029. Every match including El Clásico on ESPN Unlimited.'
-  },
-  {
-    sport:'Serie A', name:'Serie A 2025-26',
-    start:'2025-08-23', end:'2026-05-31',
-    plats:[
-      {n:'Paramount+', note:'All Serie A matches — exclusive deal', conf:true},
-    ],
-    note:'CBS Sports/Paramount+ has Serie A rights. All 380 matches streamed.'
-  },
-  {
-    sport:'Bundesliga', name:'Bundesliga 2025-26',
-    start:'2025-08-22', end:'2026-05-23',
-    plats:[
-      {n:'ESPN Unlimited', note:'All Bundesliga matches — exclusive deal', conf:true},
-    ],
-    note:'ESPN exclusive Bundesliga US rights. All 306 matches on ESPN Unlimited.'
-  },
-  {
     sport:'Winter Olympics', name:'2026 Winter Olympics — Milan-Cortina',
     start:'2026-02-06', end:'2026-02-22',
     plats:[
@@ -416,14 +390,19 @@ const EVENTS = [
 // ══════════════════════════════════════
 
 // ── NBA 2024-25 ──
-  {sport:'NBA',name:'NBA Opening Night 2024 — Celtics vs Knicks',date:'2024-10-22',time:'7:30 PM',platform:'ESPN+',conf:true},
-  {sport:'NBA',name:'NBA Opening Night 2024 — Lakers vs Timberwolves',date:'2024-10-22',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Opening Night 2024 — Boston Celtics vs New York Knicks (TNT, Celtics ring ceremony)',date:'2024-10-22',time:'7:30 PM',platform:'Max',conf:true},
+  {sport:'NBA',name:'NBA Opening Night 2024 — Minnesota Timberwolves vs Los Angeles Lakers (TNT)',date:'2024-10-22',time:'10:00 PM',platform:'Max',conf:true},
+  // TIP-OFF WEEK (Oct 23-25)
+  {sport:'NBA',name:'Tip-Off Week (ESPN) — Milwaukee Bucks at Philadelphia 76ers (Paul George debut)',date:'2024-10-23',time:'7:30 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'Tip-Off Week (ESPN) — Phoenix Suns at Los Angeles Clippers (Intuit Dome debut)',date:'2024-10-23',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'Tip-Off Week (TNT) — San Antonio Spurs at Dallas Mavericks',date:'2024-10-24',time:'7:30 PM',platform:'Max',conf:true},
+  {sport:'NBA',name:'Tip-Off Week (TNT) — Denver Nuggets vs Oklahoma City Thunder',date:'2024-10-24',time:'10:00 PM',platform:'Max',conf:true},
   {sport:'NBA',name:'NBA Cup Final 2024',date:'2024-12-14',time:'8:30 PM',platform:'ESPN+',conf:true},
-  {sport:'NBA',name:'NBA Christmas 2024 — Game 1: Knicks vs Spurs (Netflix)',date:'2024-12-25',time:'12:00 PM',platform:'Netflix',conf:true},
-  {sport:'NBA',name:'NBA Christmas 2024 — Game 2 on Netflix',date:'2024-12-25',time:'2:30 PM',platform:'Netflix',conf:true},
-  {sport:'NBA',name:'NBA Christmas 2024 — Game 3 on Netflix',date:'2024-12-25',time:'5:00 PM',platform:'Netflix',conf:true},
-  {sport:'NBA',name:'NBA Christmas 2024 — Game 4 on Netflix',date:'2024-12-25',time:'8:00 PM',platform:'Netflix',conf:true},
-  {sport:'NBA',name:'NBA Christmas 2024 — Game 5 on Netflix',date:'2024-12-25',time:'10:30 PM',platform:'Netflix',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Cleveland Cavaliers at New York Knicks (ABC/ESPN)',date:'2024-12-25',time:'12:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — San Antonio Spurs at Oklahoma City Thunder (ABC/ESPN)',date:'2024-12-25',time:'2:30 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Dallas Mavericks at Golden State Warriors (ABC/ESPN)',date:'2024-12-25',time:'5:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Houston Rockets at Los Angeles Lakers (ABC/ESPN)',date:'2024-12-25',time:'8:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Christmas 2024 — Minnesota Timberwolves at Denver Nuggets (ABC/ESPN)',date:'2024-12-25',time:'10:30 PM',platform:'ESPN+',conf:true},
   {sport:'NBA',name:'NBA All-Star Rising Stars 2025 — San Francisco',date:'2025-02-14',time:'9:00 PM',platform:'Max',conf:true},
   {sport:'NBA',name:'NBA All-Star Saturday Night 2025 — Dunk & 3-Point Contests',date:'2025-02-15',time:'8:00 PM',platform:'Max',conf:true},
   {sport:'NBA',name:'NBA All-Star Game 2025 — San Francisco',date:'2025-02-16',time:'8:00 PM',platform:'TNT / ESPN+',conf:true},
@@ -431,7 +410,8 @@ const EVENTS = [
   {sport:'NBA',name:'NBA Playoffs 2024-25 — First Round',date:'2025-04-19',time:'TBD',platform:'ESPN+ / Max',conf:true},
   {sport:'NBA',name:'NBA Playoffs 2024-25 — Conference Semifinals',date:'2025-05-05',time:'TBD',platform:'ESPN+ / Max',conf:true},
   {sport:'NBA',name:'NBA Playoffs 2024-25 — Conference Finals',date:'2025-05-19',time:'TBD',platform:'ESPN+ / Max',conf:true},
-  {sport:'NBA',name:'NBA Finals 2024-25',date:'2025-06-05',time:'9:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Finals 2024-25 — OKC Thunder vs Indiana Pacers, Game 1 (ABC)',date:'2025-06-05',time:'9:00 PM',platform:'ESPN+',conf:true},
+  {sport:'NBA',name:'NBA Finals 2024-25 — Game 7: OKC Thunder 103, Pacers 91 — Thunder win championship!',date:'2025-06-22',time:'9:00 PM',platform:'ESPN+',conf:true},
 
 // ── NHL 2024-25 ──
   {sport:'NHL',name:'NHL 2024-25 Season Opener',date:'2024-10-08',time:'7:00 PM',platform:'ESPN+ / Max',conf:true},
@@ -516,15 +496,15 @@ const EVENTS = [
   {sport:'NFL',name:'NFC Championship 2024-25 — Eagles (Fox)',date:'2025-01-26',time:'TBD',platform:'Fox',conf:true},
   {sport:'NFL',name:'Super Bowl LIX — Eagles beat Chiefs (Fox → free on Tubi)',date:'2025-02-09',time:'6:30 PM',platform:'Tubi',conf:true},
 
-// ── UFC 2025 (Jan–May: ESPN+ under old deal) ──
-  {sport:'UFC',name:'UFC 311 — Makhachev vs Tsarukyan 2 (LW Title)',date:'2025-01-18',time:'10:00 PM',platform:'ESPN+',conf:true},
-  {sport:'UFC',name:'UFC Fight Night — Dolidze vs Imavov',date:'2025-01-25',time:'7:00 PM',platform:'ESPN+',conf:true},
-  {sport:'UFC',name:'UFC 312 — Du Plessis vs Strickland 2 (MW Title)',date:'2025-02-22',time:'10:00 PM',platform:'ESPN+',conf:true},
-  {sport:'UFC',name:'UFC 313 — Pereira vs Ankalaev (LHW Title)',date:'2025-03-08',time:'10:00 PM',platform:'ESPN+',conf:true},
-  {sport:'UFC',name:'UFC 314 — Oliveira vs Chandler 3 (LW)',date:'2025-04-12',time:'10:00 PM',platform:'ESPN+',conf:true},
-  {sport:'UFC',name:'UFC 315 — Belal Muhammad vs Della Maddalena (WW Title)',date:'2025-05-10',time:'10:00 PM',platform:'ESPN+',conf:true},
-  {sport:'UFC',name:'UFC 316 — Paramount+ era begins',date:'2025-06-07',time:'10:00 PM',platform:'Paramount+',conf:true},
-  {sport:'UFC',name:'UFC Fight Night (July 2025)',date:'2025-07-12',time:'7:00 PM',platform:'Paramount+',conf:true},
+// ── UFC 2025 (Jan–Jul: ESPN+ PPV — deal ran all of 2025) ──
+  {sport:'UFC',name:'UFC 311 — Islam Makhachev vs Renato Moicano (LW Title) — Makhachev wins R1 sub',date:'2025-01-18',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 312 — Dricus du Plessis vs Sean Strickland 2 (MW Title) — DDP wins UD (Sydney)',date:'2025-02-09',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 313 — Alex Pereira vs Magomed Ankalaev (LHW Title) — Ankalaev wins UD',date:'2025-03-08',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 314 — Alexander Volkanovski vs Diego Lopes (FW Title) — Volkanovski wins UD (Miami)',date:'2025-04-12',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 315 — Belal Muhammad vs Jack Della Maddalena (WW Title) — Della Maddalena wins UD (Montreal)',date:'2025-05-10',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 316 — Merab Dvalishvili vs Sean O\'Malley (BW Title) — Dvalishvili wins R3 sub (Newark)',date:'2025-06-07',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 317 — Ilia Topuria vs Charles Oliveira (LW Title) — Topuria wins R1 KO (Las Vegas)',date:'2025-06-28',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 318 — Max Holloway vs Dustin Poirier BMF title — Holloway wins UD (New Orleans)',date:'2025-07-19',time:'10:00 PM',platform:'ESPN+',conf:true},
 
 // ── WWE 2025 PLEs (Peacock) ──
   {sport:'WWE',name:'WWE Royal Rumble 2025',date:'2025-02-01',time:'7:00 PM',platform:'Peacock',conf:true},
@@ -550,14 +530,6 @@ const EVENTS = [
   {sport:'Europa League',name:'UEL Semi-Finals 2024-25',date:'2025-05-01',time:'3:00 PM',platform:'Paramount+',conf:true},
   {sport:'Europa League',name:'UEFA Europa League Final 2024-25',date:'2025-05-21',time:'3:00 PM',platform:'Paramount+',conf:true},
 
-// ── La Liga 2024-25 ──
-  {sport:'La Liga',name:'La Liga Final Matchday 2024-25',date:'2025-05-25',time:'3:00 PM',platform:'ESPN+',conf:true},
-
-// ── Bundesliga 2024-25 ──
-  {sport:'Bundesliga',name:'Bundesliga Final Matchday 2024-25',date:'2025-05-17',time:'9:30 AM',platform:'ESPN+',conf:true},
-
-// ── Serie A 2024-25 ──
-  {sport:'Serie A',name:'Serie A Final Matchday 2024-25',date:'2025-05-25',time:'3:00 PM',platform:'Paramount+',conf:true},
 
 // ── MLS 2025 (starts Feb, mostly archive) ──
   {sport:'MLS',name:'MLS 2025 Season Opener — Week 1',date:'2025-02-22',time:'7:30 PM',platform:'Apple TV',conf:true},
@@ -567,14 +539,17 @@ const EVENTS = [
 // 2025-26 CURRENT (dates from Aug 1, 2025 onward)
 // ══════════════════════════════════════
 
-// ── UFC 2025-26 (Paramount+) ──
-  {sport:'UFC',name:'UFC Fight Night (August 2025)',date:'2025-08-02',time:'7:00 PM',platform:'Paramount+',conf:false},
-  {sport:'UFC',name:'UFC 317 — PPV',date:'2025-08-30',time:'10:00 PM',platform:'Paramount+',conf:false},
-  {sport:'UFC',name:'UFC 318 — PPV',date:'2025-10-04',time:'10:00 PM',platform:'Paramount+',conf:true},
-  {sport:'UFC',name:'UFC 319 — PPV',date:'2025-11-01',time:'10:00 PM',platform:'Paramount+',conf:true},
-  {sport:'UFC',name:'UFC 320 — Year-End PPV',date:'2025-12-06',time:'10:00 PM',platform:'Paramount+',conf:true},
-  {sport:'UFC',name:'UFC 321 — PPV (Jan 2026)',date:'2026-01-17',time:'10:00 PM',platform:'Paramount+',conf:false},
-  {sport:'UFC',name:'UFC 322 — PPV (Feb 2026)',date:'2026-02-21',time:'10:00 PM',platform:'Paramount+',conf:false},
+// ── UFC Aug–Dec 2025 (ESPN+ PPV — final months of ESPN deal) ──
+  {sport:'UFC',name:'UFC 319 — Khamzat Chimaev vs Dricus du Plessis (MW Title) — Chimaev wins UD (Chicago)',date:'2025-08-16',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 320 — Alex Pereira vs Magomed Ankalaev 2 (LHW Title) — Pereira wins R1 KO',date:'2025-10-04',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 321 — Tom Aspinall vs Ciryl Gane (HW Title) — No Contest (eye poke, Abu Dhabi)',date:'2025-10-25',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 322 — Islam Makhachev vs Jack Della Maddalena (LW Title) — Makhachev wins UD (MSG, New York)',date:'2025-11-15',time:'10:00 PM',platform:'ESPN+',conf:true},
+  {sport:'UFC',name:'UFC 323 — Petr Yan vs Merab Dvalishvili (BW Title) — Yan wins UD (Las Vegas)',date:'2025-12-06',time:'10:00 PM',platform:'ESPN+',conf:true},
+// ── UFC 2026 (Paramount+ — included with subscription, no separate PPV fee) ──
+  {sport:'UFC',name:'UFC 324 — Justin Gaethje vs Paddy Pimblett (LW) — Gaethje wins UD (Las Vegas)',date:'2026-01-24',time:'10:00 PM',platform:'Paramount+',conf:true},
+  {sport:'UFC',name:'UFC 325 — Alexander Volkanovski vs Diego Lopes 2 (FW Title) — Volkanovski wins UD (Sydney)',date:'2026-01-31',time:'10:00 PM',platform:'Paramount+',conf:true},
+  {sport:'UFC',name:'UFC 326 — Max Holloway vs Charles Oliveira (LW) ⚠ upcoming',date:'2026-03-07',time:'10:00 PM',platform:'Paramount+',conf:true},
+  {sport:'UFC',name:'UFC 327 — Joshua Van vs Tatsuro Taira (FLW Title) ⚠ upcoming',date:'2026-04-11',time:'10:00 PM',platform:'Paramount+',conf:true},
 
 // ── WWE 2025-26 ──
   {sport:'WWE',name:'WWE SummerSlam 2025',date:'2025-08-02',time:'7:00 PM',platform:'Peacock',conf:false},
@@ -595,70 +570,114 @@ const EVENTS = [
   {sport:'WWE',name:'WWE Crown Jewel 2026 (Saudi Arabia)',date:'2026-10-31',time:'1:00 PM',platform:'Netflix',conf:false},
   {sport:'WWE',name:'WWE Survivor Series 2026',date:'2026-11-28',time:'7:00 PM',platform:'Netflix',conf:false},
 
-// ── NFL 2025-26 ──
-  {sport:'NFL',name:'NFL Kickoff 2025 — Opening Night',date:'2025-09-04',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 1 — SNF',date:'2025-09-07',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 1 — MNF',date:'2025-09-08',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 2 — TNF (Amazon)',date:'2025-09-11',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 2 — SNF',date:'2025-09-14',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 2 — MNF',date:'2025-09-15',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 3 — TNF (Amazon)',date:'2025-09-18',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 3 — SNF',date:'2025-09-21',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 3 — MNF',date:'2025-09-22',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 4 — TNF (Amazon)',date:'2025-09-25',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 4 — SNF',date:'2025-09-28',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 4 — MNF',date:'2025-09-29',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 5 — TNF (Amazon)',date:'2025-10-02',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 5 — London Game',date:'2025-10-05',time:'9:30 AM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 5 — SNF',date:'2025-10-05',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 5 — MNF',date:'2025-10-06',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 6 — TNF (Amazon)',date:'2025-10-09',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 6 — SNF',date:'2025-10-12',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 6 — MNF',date:'2025-10-13',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 7 — TNF (Amazon)',date:'2025-10-16',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 7 — SNF',date:'2025-10-19',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 7 — MNF',date:'2025-10-20',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 8 — TNF (Amazon)',date:'2025-10-23',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 8 — SNF',date:'2025-10-26',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 8 — MNF',date:'2025-10-27',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 9 — TNF (Amazon)',date:'2025-10-30',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 9 — SNF',date:'2025-11-02',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 9 — MNF',date:'2025-11-03',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 10 — TNF (Amazon)',date:'2025-11-06',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 10 — Munich International Game',date:'2025-11-09',time:'9:30 AM',platform:'ESPN Unlimited',conf:false},
-  {sport:'NFL',name:'Week 10 — SNF',date:'2025-11-09',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 10 — MNF',date:'2025-11-10',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 11 — TNF (Amazon)',date:'2025-11-13',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 11 — SNF',date:'2025-11-16',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 11 — MNF',date:'2025-11-17',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 12 — TNF (Amazon)',date:'2025-11-20',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 12 — SNF',date:'2025-11-23',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 12 — MNF',date:'2025-11-24',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Thanksgiving — Game 1 (Fox)',date:'2025-11-27',time:'12:30 PM',platform:'FOX One',conf:true},
-  {sport:'NFL',name:'Thanksgiving — Game 2 (NBC/Peacock)',date:'2025-11-27',time:'4:30 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Thanksgiving — Game 3 (Amazon TNF)',date:'2025-11-27',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 13 — SNF',date:'2025-11-30',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 13 — MNF',date:'2025-12-01',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 14 — TNF (Amazon)',date:'2025-12-04',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 14 — SNF',date:'2025-12-07',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 14 — MNF',date:'2025-12-08',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 15 — TNF (Amazon)',date:'2025-12-11',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 15 — SNF',date:'2025-12-14',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 15 — MNF',date:'2025-12-15',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 16 — TNF (Amazon)',date:'2025-12-18',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 16 — SNF',date:'2025-12-21',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 16 — MNF',date:'2025-12-22',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 17 — Christmas Day Games',date:'2025-12-25',time:'TBD',platform:'Netflix',conf:false},
-  {sport:'NFL',name:'Week 17 — SNF',date:'2025-12-28',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 17 — MNF',date:'2025-12-29',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Week 18 — TNF (Amazon)',date:'2026-01-01',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
-  {sport:'NFL',name:'Week 18 — SNF (Final)',date:'2026-01-04',time:'8:20 PM',platform:'Peacock',conf:true},
-  {sport:'NFL',name:'Week 18 — MNF (Final)',date:'2026-01-05',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Wild Card Weekend 2025-26',date:'2026-01-10',time:'TBD',platform:'Peacock / Amazon Prime Video / Paramount+ / ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'Divisional Playoffs 2025-26',date:'2026-01-17',time:'TBD',platform:'Peacock / Paramount+ / ESPN Unlimited',conf:true},
-  {sport:'NFL',name:'AFC Championship Game',date:'2026-01-25',time:'TBD',platform:'Paramount+',conf:true},
-  {sport:'NFL',name:'NFC Championship Game (Fox)',date:'2026-01-25',time:'TBD',platform:'FOX One',conf:true},
-  {sport:'NFL',name:'Super Bowl LX — NBC/Peacock',date:'2026-02-08',time:'6:30 PM',platform:'Peacock',conf:true},
+// ── NFL 2025-26 (COMPLETE PRIMETIME SCHEDULE) ──
+  // ⚠ MNF weeks without specific teams listed = teams not yet confirmed in this source
+  // WEEK 1
+  {sport:'NFL',name:'NFL Kickoff — Dallas Cowboys at Philadelphia Eagles',date:'2025-09-04',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 1 SNF — Baltimore Ravens at Buffalo Bills',date:'2025-09-07',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 1 MNF — Minnesota Vikings at Chicago Bears',date:'2025-09-08',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 2
+  {sport:'NFL',name:'Week 2 TNF — Washington Commanders at Green Bay Packers',date:'2025-09-11',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 2 SNF — Atlanta Falcons at Minnesota Vikings',date:'2025-09-14',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 2 MNF — Tampa Bay Buccaneers at Houston Texans',date:'2025-09-15',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 2 MNF — Los Angeles Chargers at Las Vegas Raiders',date:'2025-09-15',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 3
+  {sport:'NFL',name:'Week 3 TNF — Miami Dolphins at Buffalo Bills',date:'2025-09-18',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 3 SNF — Kansas City Chiefs at New York Giants',date:'2025-09-21',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 3 MNF — Detroit Lions at Baltimore Ravens',date:'2025-09-22',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 4
+  {sport:'NFL',name:'Week 4 TNF — Seattle Seahawks at Arizona Cardinals',date:'2025-09-25',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 4 SNF — Green Bay Packers at Dallas Cowboys',date:'2025-09-28',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 4 MNF — New York Jets at Miami Dolphins',date:'2025-09-29',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 4 MNF — Cincinnati Bengals at Denver Broncos',date:'2025-09-29',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 5
+  {sport:'NFL',name:'Week 5 TNF — San Francisco 49ers at Los Angeles Rams',date:'2025-10-02',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 5 — London Game: Minnesota Vikings 21, Cleveland Browns 17 (Tottenham Hotspur Stadium)',date:'2025-10-05',time:'9:30 AM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 5 SNF — New England Patriots at Buffalo Bills',date:'2025-10-05',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 5 MNF — Kansas City Chiefs at Jacksonville Jaguars',date:'2025-10-06',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 6
+  {sport:'NFL',name:'Week 6 TNF — Philadelphia Eagles at New York Giants',date:'2025-10-09',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 6 SNF — Detroit Lions at Kansas City Chiefs',date:'2025-10-12',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 6 MNF — Buffalo Bills at Atlanta Falcons',date:'2025-10-13',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 6 MNF — Chicago Bears at Washington Commanders',date:'2025-10-13',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 7
+  {sport:'NFL',name:'Week 7 TNF — Pittsburgh Steelers at Cincinnati Bengals',date:'2025-10-16',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 7 SNF — Atlanta Falcons at San Francisco 49ers',date:'2025-10-19',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 7 MNF — Tampa Bay Buccaneers at Detroit Lions',date:'2025-10-20',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 7 MNF — Houston Texans at Seattle Seahawks',date:'2025-10-20',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 8
+  {sport:'NFL',name:'Week 8 TNF — Minnesota Vikings at Los Angeles Chargers',date:'2025-10-23',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 8 SNF — Green Bay Packers at Pittsburgh Steelers',date:'2025-10-26',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 8 MNF — Washington Commanders at Kansas City Chiefs',date:'2025-10-27',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 9
+  {sport:'NFL',name:'Week 9 TNF — Baltimore Ravens at Miami Dolphins',date:'2025-10-30',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 9 SNF — Seattle Seahawks at Washington Commanders',date:'2025-11-02',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 9 MNF — Arizona Cardinals at Dallas Cowboys',date:'2025-11-03',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 10
+  {sport:'NFL',name:'Week 10 TNF — Denver Broncos at Las Vegas Raiders (Final: Broncos 10-7)',date:'2025-11-06',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 10 — Berlin International Game: Indianapolis Colts 31, Atlanta Falcons 25 OT (Olympiastadion Berlin)',date:'2025-11-09',time:'9:30 AM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 10 SNF — Pittsburgh Steelers at Los Angeles Chargers',date:'2025-11-09',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 10 MNF — Philadelphia Eagles at Green Bay Packers (Final: Eagles 10-7)',date:'2025-11-10',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 11
+  {sport:'NFL',name:'Week 11 TNF — New England Patriots at New York Jets (Final: Patriots 27-14)',date:'2025-11-13',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 11 SNF — Detroit Lions at Philadelphia Eagles',date:'2025-11-16',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 11 MNF — Dallas Cowboys at Las Vegas Raiders',date:'2025-11-17',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 12
+  {sport:'NFL',name:'Week 12 TNF — Houston Texans at Buffalo Bills (Final: Texans 23-19)',date:'2025-11-20',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 12 SNF — Tampa Bay Buccaneers at Los Angeles Rams',date:'2025-11-23',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 12 MNF — Carolina Panthers at San Francisco 49ers',date:'2025-11-24',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // THANKSGIVING (Nov 27) — 3 games
+  {sport:'NFL',name:'Thanksgiving — Green Bay Packers at Detroit Lions (Fox)',date:'2025-11-27',time:'12:30 PM',platform:'FOX One',conf:true},
+  {sport:'NFL',name:'Thanksgiving — Kansas City Chiefs at Dallas Cowboys (CBS)',date:'2025-11-27',time:'4:30 PM',platform:'Paramount+',conf:true},
+  {sport:'NFL',name:'Thanksgiving SNF — Cincinnati Bengals at Baltimore Ravens (Final: Bengals 32-14)',date:'2025-11-27',time:'8:15 PM',platform:'Peacock',conf:true},
+  // BLACK FRIDAY (Nov 28, Amazon exclusive)
+  {sport:'NFL',name:'Black Friday TNF — Chicago Bears at Philadelphia Eagles (Final: Bears 24-15)',date:'2025-11-28',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  // WEEK 13
+  {sport:'NFL',name:'Week 13 SNF — Denver Broncos at Washington Commanders',date:'2025-11-30',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 13 MNF — New York Giants at New England Patriots',date:'2025-12-01',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 14
+  {sport:'NFL',name:'Week 14 TNF — Dallas Cowboys at Detroit Lions (Final: Lions 44-30)',date:'2025-12-04',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 14 SNF — Houston Texans at Kansas City Chiefs',date:'2025-12-07',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 14 MNF — Philadelphia Eagles at Los Angeles Chargers',date:'2025-12-08',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 15
+  {sport:'NFL',name:'Week 15 TNF — Tampa Bay Buccaneers at Atlanta Falcons (Final: Falcons 29-28)',date:'2025-12-11',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 15 SNF — Minnesota Vikings at Dallas Cowboys',date:'2025-12-14',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 15 MNF — Miami Dolphins at Pittsburgh Steelers',date:'2025-12-15',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 16
+  {sport:'NFL',name:'Week 16 TNF — Los Angeles Rams at Seattle Seahawks (Final: Seahawks 38-37)',date:'2025-12-18',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Week 16 SNF — New England Patriots at Baltimore Ravens',date:'2025-12-21',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 16 MNF — San Francisco 49ers at Indianapolis Colts',date:'2025-12-22',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // CHRISTMAS (Dec 25) — 3 games: 2 Netflix + 1 Amazon TNF
+  {sport:'NFL',name:'Christmas — Dallas Cowboys at Washington Commanders (Netflix)',date:'2025-12-25',time:'1:00 PM',platform:'Netflix',conf:true},
+  {sport:'NFL',name:'Christmas — Detroit Lions at Minnesota Vikings (Netflix)',date:'2025-12-25',time:'4:30 PM',platform:'Netflix',conf:true},
+  {sport:'NFL',name:'Christmas TNF — Denver Broncos at Kansas City Chiefs (Final: Broncos 20-13)',date:'2025-12-25',time:'8:15 PM',platform:'Amazon Prime Video',conf:true},
+  // WEEK 17
+  {sport:'NFL',name:'Week 17 SNF Saturday (Peacock only) — Baltimore Ravens vs Green Bay Packers',date:'2025-12-27',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 17 SNF — Chicago Bears at San Francisco 49ers',date:'2025-12-28',time:'8:20 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Week 17 MNF — Los Angeles Rams at Atlanta Falcons',date:'2025-12-29',time:'8:15 PM',platform:'ESPN Unlimited',conf:true},
+  // WEEK 18
+  {sport:'NFL',name:'Week 18 Saturday — Carolina Panthers at Tampa Bay Buccaneers (playoff implications)',date:'2026-01-03',time:'4:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 18 Saturday — Seattle Seahawks at San Francisco 49ers (playoff implications)',date:'2026-01-03',time:'8:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Week 18 SNF — Pittsburgh Steelers at Baltimore Ravens',date:'2026-01-04',time:'8:20 PM',platform:'Peacock',conf:true},
+  // ── PLAYOFFS 2025-26 (ALL COMPLETED — Super Bowl LX: Feb 8, 2026) ──
+  // Broadcast channels verified per-game
+  // WILD CARD (Jan 10-12, 2026)
+  {sport:'NFL',name:'Wild Card NFC — (5) LA Rams at (4) Carolina Panthers — Rams win 34-31',date:'2026-01-10',time:'4:30 PM',platform:'FOX One',conf:true},
+  {sport:'NFL',name:'Wild Card NFC — (7) Green Bay Packers at (2) Chicago Bears — Bears win 31-27',date:'2026-01-10',time:'8:00 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NFL',name:'Wild Card AFC — (6) Buffalo Bills at (3) Jacksonville Jaguars — Bills win 27-24',date:'2026-01-11',time:'1:00 PM',platform:'Paramount+',conf:true},
+  {sport:'NFL',name:'Wild Card NFC — (6) San Francisco 49ers at (3) Philadelphia Eagles — 49ers win 23-19',date:'2026-01-11',time:'4:30 PM',platform:'FOX One',conf:true},
+  {sport:'NFL',name:'Wild Card AFC — (7) LA Chargers at (2) New England Patriots — Patriots win 16-3',date:'2026-01-11',time:'8:00 PM',platform:'Peacock',conf:true},
+  {sport:'NFL',name:'Wild Card AFC — (5) Houston Texans at (4) Pittsburgh Steelers — Texans win 30-6',date:'2026-01-12',time:'8:00 PM',platform:'ESPN Unlimited',conf:true},
+  // DIVISIONAL (Jan 17-18, 2026)
+  {sport:'NFL',name:'Divisional AFC — (6) Buffalo Bills at (1) Denver Broncos — Broncos win 33-30 OT',date:'2026-01-17',time:'4:30 PM',platform:'Paramount+',conf:true},
+  {sport:'NFL',name:'Divisional NFC — (6) San Francisco 49ers at (1) Seattle Seahawks — Seahawks win 41-6',date:'2026-01-17',time:'8:00 PM',platform:'FOX One',conf:true},
+  {sport:'NFL',name:'Divisional AFC — (5) Houston Texans at (2) New England Patriots — Patriots win 28-16',date:'2026-01-18',time:'3:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NFL',name:'Divisional NFC — (5) LA Rams at (2) Chicago Bears — Rams win 20-17 OT',date:'2026-01-18',time:'6:30 PM',platform:'Peacock',conf:true},
+  // CONFERENCE CHAMPIONSHIPS (Jan 25, 2026)
+  {sport:'NFL',name:'AFC Championship — NE Patriots at Denver Broncos — Patriots win 10-7',date:'2026-01-25',time:'3:00 PM',platform:'Paramount+',conf:true},
+  {sport:'NFL',name:'NFC Championship — LA Rams at Seattle Seahawks — Seahawks win 31-27',date:'2026-01-25',time:'6:30 PM',platform:'FOX One',conf:true},
+  // SUPER BOWL LX (Feb 8, 2026) — SEAHAWKS WON
+  {sport:'NFL',name:"Super Bowl LX — Seattle Seahawks 29, New England Patriots 13 (Levi's Stadium, Santa Clara)",date:'2026-02-08',time:'6:30 PM',platform:'Peacock',conf:true},
 
 // ── MLB 2025 ──
   {sport:'MLB',name:'MLB Opening Day 2025',date:'2025-03-27',time:'TBD',platform:'ESPN Unlimited / Fox',conf:true},
@@ -680,15 +699,32 @@ const EVENTS = [
   {sport:'MLB',name:'ALCS 2025',date:'2025-10-14',time:'TBD',platform:'ESPN Unlimited',conf:true},
   {sport:'MLB',name:'NLCS 2025',date:'2025-10-14',time:'TBD',platform:'Fox / FS1',conf:true},
   {sport:'MLB',name:'World Series 2025 — Game 1',date:'2025-10-24',time:'8:08 PM',platform:'Fox',conf:true},
-  {sport:'MLB',name:'MLB Opening Day 2026',date:'2026-03-26',time:'TBD',platform:'ESPN Unlimited / Fox',conf:false},
-  {sport:'MLB',name:'MLB All-Star Game 2026',date:'2026-07-14',time:'8:00 PM',platform:'Fox',conf:false},
+  {sport:'MLB',name:'MLB Opening Day 2026',date:'2026-03-26',time:'TBD',platform:'ESPN Unlimited / Fox',conf:true},
+  {sport:'MLB',name:'Friday Night Baseball 2026 — begins (Apple TV, free)',date:'2026-04-03',time:'7:00 PM',platform:'Apple TV',conf:true},
+  {sport:'MLB',name:'Saturday Leadoff 2026 — begins (Peacock exclusive)',date:'2026-04-04',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'MLB',name:'Sunday Night Baseball 2026 — begins (ESPN)',date:'2026-04-05',time:'7:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'MLB',name:'MLB All-Star Home Run Derby 2026',date:'2026-07-13',time:'8:00 PM',platform:'ESPN Unlimited',conf:false},
+  {sport:'MLB',name:'MLB All-Star Game 2026 ⚠ location TBD',date:'2026-07-14',time:'8:00 PM',platform:'Fox',conf:false},
+  {sport:'MLB',name:'Wild Card Series 2026 ⚠ dates TBD',date:'2026-09-30',time:'TBD',platform:'ESPN Unlimited / Fox / Max',conf:false},
+  {sport:'MLB',name:'World Series 2026 — Game 1 ⚠ date TBD',date:'2026-10-23',time:'8:08 PM',platform:'Fox',conf:false},
 
 // ── MLS 2025 (current portion) ──
   {sport:'MLS',name:'MLS Cup Playoffs — First Round',date:'2025-10-25',time:'TBD',platform:'Apple TV',conf:true},
   {sport:'MLS',name:'MLS Cup Final 2025',date:'2025-12-07',time:'4:00 PM',platform:'Apple TV',conf:true},
 
 // ── PREMIER LEAGUE 2025-26 ──
-  {sport:'Premier League',name:'GW1 — All 10 matches',date:'2025-08-16',time:'TBD',platform:'Peacock',conf:true},
+  // US rights: ALL 380 matches on Peacock. Select marquee matches simulcast on NBC or USA Network.
+  // GW1 (Aug 16-18, 2025) — confirmed results
+  {sport:'Premier League',name:'GW1 — Tottenham Hotspur 3-0 Burnley',date:'2025-08-16',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Wolverhampton 0-4 Manchester City',date:'2025-08-16',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Aston Villa 0-0 Newcastle United',date:'2025-08-16',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Brighton 1-1 Fulham',date:'2025-08-16',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Sunderland 3-0 West Ham United',date:'2025-08-16',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Chelsea 0-0 Crystal Palace',date:'2025-08-17',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Nottingham Forest 3-1 Brentford',date:'2025-08-17',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Manchester United 0-1 Arsenal',date:'2025-08-17',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Leeds United 1-0 Everton',date:'2025-08-18',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW1 — Liverpool 4-2 AFC Bournemouth (Fri curtain-raiser, Anfield)',date:'2025-08-15',time:'3:00 PM',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW2 — All 10 matches',date:'2025-08-23',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW3 — All 10 matches',date:'2025-08-30',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW4 — All 10 matches',date:'2025-09-13',time:'TBD',platform:'Peacock',conf:true},
@@ -713,9 +749,39 @@ const EVENTS = [
   {sport:'Premier League',name:'GW23 — Midweek matches',date:'2026-01-18',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW24 — All 10 matches',date:'2026-01-25',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW25 — All 10 matches',date:'2026-02-04',time:'TBD',platform:'Peacock',conf:true},
-  {sport:'Premier League',name:'GW26 — Midweek matches',date:'2026-02-07',time:'TBD',platform:'Peacock',conf:true},
-  {sport:'Premier League',name:'GW27 — All 10 matches',date:'2026-02-21',time:'TBD',platform:'Peacock',conf:true},
-  {sport:'Premier League',name:'GW28 — Midweek matches',date:'2026-02-25',time:'TBD',platform:'Peacock',conf:true},
+  // GW26 (Feb 10-12, 2026) — midweek round
+  {sport:'Premier League',name:'GW26 — Tottenham vs Newcastle United',date:'2026-02-10',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Chelsea vs Leeds United',date:'2026-02-10',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Everton vs Bournemouth',date:'2026-02-10',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Aston Villa vs Brighton',date:'2026-02-11',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Brentford vs Arsenal',date:'2026-02-11',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Crystal Palace vs Burnley',date:'2026-02-11',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Manchester City vs Fulham',date:'2026-02-11',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Nottingham Forest vs Wolverhampton',date:'2026-02-11',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — Sunderland vs Liverpool',date:'2026-02-11',time:'TBD',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW26 — West Ham United vs Manchester United',date:'2026-02-11',time:'TBD',platform:'Peacock',conf:true},
+  // GW27 (Feb 21-23, 2026) — confirmed ET times & US channels
+  {sport:'Premier League',name:'GW27 — Chelsea vs Burnley',date:'2026-02-21',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Aston Villa vs Leeds United',date:'2026-02-21',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Brentford vs Brighton',date:'2026-02-21',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — West Ham United vs Bournemouth',date:'2026-02-21',time:'12:30 PM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Manchester City vs Newcastle United',date:'2026-02-21',time:'3:00 PM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Nottingham Forest vs Liverpool',date:'2026-02-22',time:'9:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Crystal Palace vs Wolverhampton',date:'2026-02-22',time:'9:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Sunderland vs Fulham',date:'2026-02-22',time:'9:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Tottenham Hotspur vs Arsenal (North London Derby)',date:'2026-02-22',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW27 — Everton vs Manchester United',date:'2026-02-23',time:'3:00 PM',platform:'USA Network',conf:true},
+  // GW28 (Feb 27 – Mar 1, 2026) — confirmed fixtures with ET times + US channels
+  {sport:'Premier League',name:'GW28 — Wolverhampton vs Aston Villa',date:'2026-02-27',time:'3:00 PM',platform:'USA Network',conf:true},
+  {sport:'Premier League',name:'GW28 — Bournemouth vs Sunderland',date:'2026-02-28',time:'7:30 AM',platform:'USA Network',conf:true},
+  {sport:'Premier League',name:'GW28 — Burnley vs Brentford',date:'2026-02-28',time:'10:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW28 — Liverpool vs West Ham United',date:'2026-02-28',time:'10:00 AM',platform:'USA Network',conf:true},
+  {sport:'Premier League',name:'GW28 — Newcastle United vs Everton',date:'2026-02-28',time:'10:00 AM',platform:'USA Network',conf:true},
+  {sport:'Premier League',name:'GW28 — Leeds United vs Manchester City',date:'2026-02-28',time:'12:30 PM',platform:'NBC',conf:true},
+  {sport:'Premier League',name:'GW28 — Brighton vs Nottingham Forest',date:'2026-03-01',time:'9:00 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'GW28 — Manchester United vs Crystal Palace',date:'2026-03-01',time:'9:00 AM',platform:'USA Network',conf:true},
+  {sport:'Premier League',name:'GW28 — Fulham vs Tottenham Hotspur',date:'2026-03-01',time:'9:00 AM',platform:'USA Network',conf:true},
+  {sport:'Premier League',name:'GW28 — Arsenal vs Chelsea (Emirates Stadium)',date:'2026-03-01',time:'11:30 AM',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW29 — All 10 matches',date:'2026-03-07',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW30 — All 10 matches',date:'2026-03-14',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW31 — All 10 matches',date:'2026-04-04',time:'TBD',platform:'Peacock',conf:true},
@@ -726,21 +792,70 @@ const EVENTS = [
   {sport:'Premier League',name:'GW36 — All 10 matches',date:'2026-05-09',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW37 — All 10 matches',date:'2026-05-16',time:'TBD',platform:'Peacock',conf:true},
   {sport:'Premier League',name:'GW38 — Final Day (all concurrent)',date:'2026-05-24',time:'11:00 AM',platform:'Peacock',conf:true},
-  {sport:'Premier League',name:'Manchester Derby (approx.)',date:'2025-11-08',time:'TBD',platform:'Peacock',conf:false},
-  {sport:'Premier League',name:'North London Derby — Arsenal vs Spurs (approx.)',date:'2025-11-01',time:'TBD',platform:'Peacock',conf:false},
-  {sport:'Premier League',name:'Liverpool vs Man City (approx.)',date:'2025-11-22',time:'TBD',platform:'Peacock',conf:false},
+  // Manchester Derby — both legs confirmed
+  {sport:'Premier League',name:'Manchester Derby GW4 — Manchester City vs Manchester United (Etihad)',date:'2025-09-14',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'Manchester Derby GW22 — Manchester United vs Manchester City (Old Trafford)',date:'2026-01-17',time:'7:30 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'North London Derby — confirmed in GW27: Tottenham vs Arsenal (Feb 22)',date:'2026-02-22',time:'11:30 AM',platform:'Peacock',conf:true},
+  // Liverpool vs Man City — both legs confirmed
+  {sport:'Premier League',name:'Liverpool vs Man City GW11 — Manchester City vs Liverpool (Etihad)',date:'2025-11-09',time:'11:30 AM',platform:'Peacock',conf:true},
+  {sport:'Premier League',name:'Liverpool vs Man City GW25 — Liverpool vs Manchester City (Anfield)',date:'2026-02-08',time:'11:30 AM',platform:'Peacock',conf:true},
 
 // ── NBA 2025-26 ──
-  {sport:'NBA',name:'NBA Opening Night 2025',date:'2025-10-21',time:'7:30 PM',platform:'ESPN Unlimited',conf:true},
+  // New era: NBC/Peacock (100 games), Amazon Prime Video, ESPN/ABC
+  // OKC Thunder are defending champions (won 2024-25 title)
+  // OPENING NIGHT (Oct 21, NBC/Peacock — NOT ESPN)
+  {sport:'NBA',name:'Opening Night — Houston Rockets at Oklahoma City Thunder (OKC celebrates title)',date:'2025-10-21',time:'7:30 PM',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'Opening Night — Golden State Warriors at Los Angeles Lakers',date:'2025-10-21',time:'10:00 PM',platform:'Peacock',conf:true},
+  // ESPN WEEK 1 (Oct 22-23)
+  {sport:'NBA',name:'ESPN Doubleheader — Cleveland Cavaliers at New York Knicks',date:'2025-10-22',time:'7:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'ESPN Doubleheader — San Antonio Spurs at Dallas Mavericks',date:'2025-10-22',time:'9:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'ESPN — Oklahoma City Thunder at Indiana Pacers',date:'2025-10-23',time:'7:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'ESPN — Denver Nuggets at Golden State Warriors',date:'2025-10-23',time:'10:00 PM',platform:'ESPN Unlimited',conf:true},
+  // PRIME VIDEO WEEK 1 (Oct 24)
+  {sport:'NBA',name:'Prime Video — New York Knicks at Boston Celtics',date:'2025-10-24',time:'7:30 PM',platform:'Amazon Prime Video',conf:true},
+  {sport:'NBA',name:'Prime Video — Minnesota Timberwolves at Los Angeles Lakers',date:'2025-10-24',time:'10:00 PM',platform:'Amazon Prime Video',conf:true},
+  // PEACOCK MONDAY debut (Oct 27, Peacock exclusive)
+  {sport:'NBA',name:'Peacock Monday — Cleveland Cavaliers at Detroit Pistons',date:'2025-10-27',time:'7:00 PM',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'Peacock Monday — Denver Nuggets at Minnesota Timberwolves',date:'2025-10-27',time:'9:30 PM',platform:'Peacock',conf:true},
+  // COAST 2 COAST TUESDAY debut (Oct 28, NBC/Peacock)
+  {sport:'NBA',name:'Coast 2 Coast Tue — New York Knicks at Milwaukee Bucks',date:'2025-10-28',time:'8:00 PM',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'Coast 2 Coast Tue — Los Angeles Clippers at Golden State Warriors',date:'2025-10-28',time:'11:00 PM',platform:'Peacock',conf:true},
+  // MEXICO CITY GAME (Nov 1, Peacock)
+  {sport:'NBA',name:'NBA Mexico City Game — Dallas Mavericks at Detroit Pistons (Arena Ciudad de México)',date:'2025-11-01',time:'TBD',platform:'Peacock',conf:true},
+  // NBA CUP
   {sport:'NBA',name:'NBA Cup — Group Play Begins',date:'2025-11-04',time:'TBD',platform:'ESPN Unlimited / Amazon Prime Video / Peacock',conf:true},
-  {sport:'NBA',name:'NBA Cup — Quarterfinals & Semifinals (Prime exclusive)',date:'2025-12-09',time:'TBD',platform:'Amazon Prime Video',conf:true},
-  {sport:'NBA',name:'NBA Cup Final (Prime exclusive)',date:'2025-12-13',time:'TBD',platform:'Amazon Prime Video',conf:true},
-  {sport:'NBA',name:'NBA Christmas Day Games (ESPN/ABC)',date:'2025-12-25',time:'12:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'NBA Cup — Quarterfinals & Semifinals (Prime Video exclusive)',date:'2025-12-09',time:'TBD',platform:'Amazon Prime Video',conf:true},
+  {sport:'NBA',name:'NBA Cup Final (Prime Video exclusive)',date:'2025-12-13',time:'TBD',platform:'Amazon Prime Video',conf:true},
+  // THANKSGIVING EVE (Nov 26, ESPN tripleheader)
+  {sport:'NBA',name:'Thanksgiving Eve — Detroit Pistons at Boston Celtics',date:'2025-11-26',time:'5:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Thanksgiving Eve — Minnesota Timberwolves at Oklahoma City Thunder',date:'2025-11-26',time:'7:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Thanksgiving Eve — Golden State Warriors at Houston Rockets',date:'2025-11-26',time:'10:00 PM',platform:'ESPN Unlimited',conf:true},
+  // CHRISTMAS (Dec 25, ESPN/ABC — 5 games)
+  {sport:'NBA',name:'Christmas Day — Cleveland Cavaliers at New York Knicks',date:'2025-12-25',time:'12:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Christmas Day — San Antonio Spurs at Oklahoma City Thunder',date:'2025-12-25',time:'2:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Christmas Day — Dallas Mavericks at Golden State Warriors',date:'2025-12-25',time:'5:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Christmas Day — Houston Rockets at Los Angeles Lakers',date:'2025-12-25',time:'8:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Christmas Day — Minnesota Timberwolves at Denver Nuggets',date:'2025-12-25',time:'10:30 PM',platform:'ESPN Unlimited',conf:true},
+  // SUNDAY NIGHT BASKETBALL debut (Feb 1, NBC/Peacock)
+  {sport:'NBA',name:'Sunday Night Basketball debut — LA Lakers at New York Knicks (MSG)',date:'2026-02-01',time:'8:00 PM',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'Sunday Night Basketball — Oklahoma City Thunder at Denver Nuggets',date:'2026-02-01',time:'10:30 PM',platform:'Peacock',conf:true},
+  // MLK DAY (Jan 19, NBC/Peacock quadrupleheader)
+  {sport:'NBA',name:'MLK Day — Milwaukee Bucks at Atlanta Hawks',date:'2026-01-19',time:'1:00 PM',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'MLK Day — Oklahoma City Thunder at Cleveland Cavaliers',date:'2026-01-19',time:'2:30 PM',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'MLK Day — Dallas Mavericks at New York Knicks',date:'2026-01-19',time:'5:00 PM',platform:'Peacock',conf:true},
+  {sport:'NBA',name:'MLK Day — Boston Celtics at Detroit Pistons',date:'2026-01-19',time:'8:00 PM',platform:'Peacock',conf:true},
+  // RIVALS WEEK (Jan 24, ABC tripleheader)
+  {sport:'NBA',name:'Rivals Week — Philadelphia 76ers vs New York Knicks',date:'2026-01-24',time:'3:00 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Rivals Week — Golden State Warriors vs Minnesota Timberwolves',date:'2026-01-24',time:'5:30 PM',platform:'ESPN Unlimited',conf:true},
+  {sport:'NBA',name:'Rivals Week — Los Angeles Lakers vs Dallas Mavericks',date:'2026-01-24',time:'8:00 PM',platform:'ESPN Unlimited',conf:true},
+  // ALL-STAR WEEKEND (NBC/Peacock) — during Winter Olympics
   {sport:'NBA',name:'NBA All-Star Saturday Night (NBC/Peacock)',date:'2026-02-14',time:'TBD',platform:'Peacock',conf:true},
   {sport:'NBA',name:'NBA All-Star Game 2026 (NBC/Peacock)',date:'2026-02-15',time:'TBD',platform:'Peacock',conf:true},
-  {sport:'NBA',name:'NBA Play-In Tournament (Prime Video exclusive)',date:'2026-04-14',time:'TBD',platform:'Amazon Prime Video',conf:true},
-  {sport:'NBA',name:'NBA Playoffs 2025-26 — First Round',date:'2026-04-18',time:'TBD',platform:'ESPN Unlimited / Amazon Prime Video / Peacock',conf:true},
-  {sport:'NBA',name:'NBA Finals 2026 (ABC/ESPN Unlimited)',date:'2026-06-04',time:'9:00 PM',platform:'ESPN Unlimited',conf:true},
+  // PLAY-IN & PLAYOFFS
+  {sport:'NBA',name:'NBA Play-In Tournament — Apr 14-17 (Prime Video exclusive)',date:'2026-04-14',time:'TBD',platform:'Amazon Prime Video',conf:true},
+  {sport:'NBA',name:'NBA Playoffs 2025-26 — First & Second Rounds (ABC/ESPN + NBC/Peacock + Prime Video)',date:'2026-04-18',time:'TBD',platform:'ESPN Unlimited / Peacock / Amazon Prime Video',conf:true},
+  {sport:'NBA',name:'NBA Playoffs — Conference Finals (ABC/ESPN one series + NBC/Peacock one series)',date:'2026-05-15',time:'TBD',platform:'ESPN Unlimited / Peacock',conf:true},
+  {sport:'NBA',name:'NBA Finals 2026 — ABC exclusive, all games 8:30 PM ET (Jun 3-19)',date:'2026-06-03',time:'8:30 PM',platform:'ESPN Unlimited',conf:true},
 
 // ── NHL 2025-26 ──
   {sport:'NHL',name:'NHL 2025-26 Season Opener',date:'2025-10-07',time:'7:00 PM',platform:'ESPN Unlimited / Max',conf:true},
@@ -773,19 +888,6 @@ const EVENTS = [
   {sport:'Europa League',name:'UEFA Europa League 2025-26 Begins',date:'2025-09-18',time:'3:00 PM',platform:'Paramount+',conf:true},
   {sport:'Europa League',name:'UEFA Europa League Final 2025-26',date:'2026-05-20',time:'3:00 PM',platform:'Paramount+',conf:true},
 
-// ── LA LIGA 2025-26 ──
-  {sport:'La Liga',name:'La Liga 2025-26 Season Opener',date:'2025-08-15',time:'3:00 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'La Liga',name:'El Clásico 2025-26 (approx.)',date:'2025-10-25',time:'3:00 PM',platform:'ESPN Unlimited',conf:false},
-  {sport:'La Liga',name:'La Liga Final Matchday 2025-26',date:'2026-05-24',time:'3:00 PM',platform:'ESPN Unlimited',conf:true},
-
-// ── BUNDESLIGA 2025-26 ──
-  {sport:'Bundesliga',name:'Bundesliga 2025-26 Season Opener',date:'2025-08-22',time:'2:30 PM',platform:'ESPN Unlimited',conf:true},
-  {sport:'Bundesliga',name:'Der Klassiker: Bayern vs Dortmund (approx.)',date:'2025-11-08',time:'12:30 PM',platform:'ESPN Unlimited',conf:false},
-  {sport:'Bundesliga',name:'Bundesliga Final Matchday 2025-26',date:'2026-05-23',time:'9:30 AM',platform:'ESPN Unlimited',conf:true},
-
-// ── SERIE A 2025-26 ──
-  {sport:'Serie A',name:'Serie A 2025-26 Season Opener',date:'2025-08-23',time:'2:45 PM',platform:'Paramount+',conf:true},
-  {sport:'Serie A',name:'Serie A Final Matchday 2025-26',date:'2026-05-31',time:'3:00 PM',platform:'Paramount+',conf:true},
 
 // ── WINTER OLYMPICS 2026 ──
   {sport:'Winter Olympics',name:'2026 Winter Olympics — Opening Ceremony',date:'2026-02-06',time:'2:00 PM',platform:'Peacock',conf:true},
@@ -830,6 +932,15 @@ function pillHtml(sport) {
 }
 function platChips(platform) {
   return platform.split('/').map(p=>`<span class="plat-chip">${p.trim()}</span>`).join('');
+}
+// Platforms with no broadcast/cable alternative — streaming exclusive only
+const EXCL_PLATFORMS = new Set(['Netflix','Amazon Prime Video','Apple TV']);
+function isExclusive(ev) {
+  const p = ev.platform.trim();
+  if (EXCL_PLATFORMS.has(p)) return true;
+  // Peacock-only games explicitly noted
+  if (p === 'Peacock' && /peacock.only/i.test(ev.name)) return true;
+  return false;
 }
 
 // ============================================================
@@ -885,9 +996,10 @@ function renderSeasons() {
   document.getElementById('season-grid').innerHTML = toShow.map(s => {
     const c  = sc(s.sport);
     const st = getStatus(s.start, s.end);
-    const plats = s.plats.map(p=>
-      `<span class="plat-tag${p.conf?'':' unc'}" title="${p.note}">${p.n}</span>`
-    ).join('');
+    const plats = s.plats.map(p=>{
+      const exclMark = EXCL_PLATFORMS.has(p.n)?` <span class="excl-star" title="Streaming exclusive — only on ${p.n}">★</span>`:'';
+      return `<span class="plat-tag${p.conf?'':' unc'}" title="${p.note}">${p.n}${exclMark}</span>`;
+    }).join('');
     return `<div class="season-card">
       <div class="card-top">
         <span class="sport-badge" style="background:${c.bg};color:${c.tx}">${s.sport}</span>
@@ -963,10 +1075,11 @@ function renderBySport(evts) {
     const c    = sc(sport);
     const list = bySport[sport];
     const rows = list.map(e=>{
-      const unc = !e.conf?`<span class="unc-flag" title="Verify platform">⚠</span>`:'';
+      const unc = !e.conf?`<span class="unc-flag" title="Verify platform before streaming">⚠</span>`:'';
+      const excl = isExclusive(e)?`<span class="excl-star" title="Streaming exclusive — only available on ${e.platform}">★ exclusive</span>`:'';
       return `<div class="sport-event-row">
         <span class="se-date">${fmtDateShort(e.date)}</span>
-        <span class="se-name">${e.name}${unc}</span>
+        <span class="se-name">${e.name}${excl}${unc}</span>
         <span class="se-plats">${platChips(e.platform)}</span>
       </div>`;
     }).join('');
